@@ -220,8 +220,50 @@ function produtoCombinaComPrincipioSimples(produto, principioAtivoBusca, termoBu
   return true;
 }
 
+function obterClassificacaoSolicitada(intencaoClassificacao) {
+  if (
+    intencaoClassificacao?.querGenerico &&
+    !intencaoClassificacao?.querReferencia &&
+    !intencaoClassificacao?.querSimilar
+  ) {
+    return 'GENERICO';
+  }
+
+  if (
+    intencaoClassificacao?.querReferencia &&
+    !intencaoClassificacao?.querGenerico &&
+    !intencaoClassificacao?.querSimilar
+  ) {
+    return 'REFERENCIA';
+  }
+
+  if (
+    intencaoClassificacao?.querSimilar &&
+    !intencaoClassificacao?.querGenerico &&
+    !intencaoClassificacao?.querReferencia
+  ) {
+    return 'SIMILAR';
+  }
+
+  return null;
+}
+
+function produtoCombinaComClassificacaoSolicitada(produto, intencaoClassificacao) {
+  const classificacaoSolicitada = obterClassificacaoSolicitada(intencaoClassificacao);
+  if (!classificacaoSolicitada) {
+    return true;
+  }
+
+  const tipoClassificacao = String(produto?.tipo_classificacao_canonica || '').trim().toUpperCase();
+  if (!tipoClassificacao || tipoClassificacao === 'DESCONHECIDO') {
+    return true;
+  }
+
+  return tipoClassificacao === classificacaoSolicitada;
+}
+
 function aplicarRegrasDeterministicas(produto, contextoBusca) {
-  const { principioAtivoBusca, termoBusca } = contextoBusca || {};
+  const { principioAtivoBusca, termoBusca, intencaoClassificacao } = contextoBusca || {};
   const relacionadoAtual = produto?.relacionado_busca;
 
   if (relacionadoAtual !== true) {
@@ -232,6 +274,17 @@ function aplicarRegrasDeterministicas(produto, contextoBusca) {
     console.log(
       `[ETAPA 4] Override deterministico: produto marcado como nao relacionado ` +
       `| motivo=principio_ativo_composto_ou_divergente | ${descreverProdutoParaLog(produto)}`
+    );
+    return {
+      ...produto,
+      relacionado_busca: false
+    };
+  }
+
+  if (!produtoCombinaComClassificacaoSolicitada(produto, intencaoClassificacao)) {
+    console.log(
+      `[ETAPA 4] Override deterministico: produto marcado como nao relacionado ` +
+      `| motivo=classificacao_divergente | ${descreverProdutoParaLog(produto)}`
     );
     return {
       ...produto,
@@ -310,14 +363,10 @@ function aplicarScoreFinalIA(produtos) {
 async function marcarProdutosComIA(produtos, contextoBusca) {
   const termoBusca = contextoBusca?.termoBusca || '';
   if (!Array.isArray(produtos) || produtos.length <= 1) {
-    const produtosMarcados = (produtos || []).map(produto => ({
-      ...produto,
-      relacionado_busca: produtoCombinaComPrincipioSimples(
-        { ...produto, relacionado_busca: true },
-        contextoBusca?.principioAtivoBusca,
-        termoBusca
-      )
-    }));
+    const produtosMarcados = (produtos || []).map(produto => aplicarRegrasDeterministicas(
+      { ...produto, relacionado_busca: true },
+      contextoBusca
+    ));
 
     return {
       produtosMarcados,
@@ -327,13 +376,16 @@ async function marcarProdutosComIA(produtos, contextoBusca) {
   }
 
   const listaProdutos = criarListaProdutosCompacta(produtos);
+  const classificacaoSolicitada = obterClassificacaoSolicitada(contextoBusca?.intencaoClassificacao);
   logResumoProdutos('Lote recebido para marcacao', produtos);
   logPayloadCompacto(listaProdutos);
   const prompt = `Analise a busca farmacêutica "${termoBusca}" e marque se cada item tem relacao direta com a busca.
 
 Contexto extraido da busca:
+- termo_principal: ${contextoBusca?.termoBuscaPrincipal || termoBusca}
 - principio_ativo: ${contextoBusca?.principioAtivoBusca || 'nao identificado'}
 - forma_farmaceutica: ${contextoBusca?.formaFarmaceutica || 'nao identificada'}
+- classificacao_preferida: ${classificacaoSolicitada || 'nao especificada'}
 
 Produtos (total: ${listaProdutos.length}):
 ${JSON.stringify(listaProdutos, null, 2)}
@@ -349,6 +401,9 @@ Cada objeto possui:
 Marque ok=true apenas quando o produto tiver relacao direta com a busca.
 Marque ok=false quando o item for generico demais, vier de match fraco, ou contrariar algo explicito da busca como forma/concentracao/nome distintivo.
 Se a busca mencionar apenas um principio ativo simples, nao marque como relacionado um produto composto com outros principios ativos, a menos que a busca diga "composto" ou equivalente.
+Se classificacao_preferida for GENERICO, prefira apenas itens GENERICO e rejeite REFERENCIA ou SIMILAR sem necessidade.
+Se classificacao_preferida for REFERENCIA ou SIMILAR, siga a mesma logica de aderencia para a classificacao solicitada.
+Rejeite produtos cujo nome ou principio ativo nao tenham relacao direta com o termo principal ou com o principio ativo resolvido.
 
 IMPORTANTE:
 - Retorne APENAS um array JSON de objetos
@@ -411,12 +466,17 @@ async function ordenarPorIA(produtos, contextoBusca) {
 
   if (produtos.length <= 1) {
     console.log(`[ETAPA 4] ⚠️ Apenas ${produtos.length} produto(s) - marcacao trivial`);
+    const resultadoTrivial = await marcarProdutosComIA(produtos, contextoBusca);
     return {
-      produtos: produtos.map(produto => ({ ...produto, relacionado_busca: true })),
+      produtos: aplicarScoreFinalIA(resultadoTrivial.produtosMarcados),
       ordenado: false,
       filtrado: false,
       avaliado: true,
-      estatisticasIA: { aprovados: produtos.length, rejeitados: 0, analisados: produtos.length }
+      estatisticasIA: {
+        aprovados: resultadoTrivial.aprovados,
+        rejeitados: resultadoTrivial.rejeitados,
+        analisados: produtos.length
+      }
     };
   }
 
@@ -426,12 +486,17 @@ async function ordenarPorIA(produtos, contextoBusca) {
 
     if (produtosParaIA.length <= 1) {
       console.log(`[ETAPA 4] ⚠️ Menos de 2 produtos relevantes para marcar com IA`);
+      const resultadoTrivial = await marcarProdutosComIA(produtosParaIA, contextoBusca);
       return {
-        produtos: produtos.map(produto => ({ ...produto, relacionado_busca: true })),
+        produtos: aplicarScoreFinalIA(resultadoTrivial.produtosMarcados),
         ordenado: false,
         filtrado: false,
         avaliado: true,
-        estatisticasIA: { aprovados: produtos.length, rejeitados: 0, analisados: produtos.length }
+        estatisticasIA: {
+          aprovados: resultadoTrivial.aprovados,
+          rejeitados: resultadoTrivial.rejeitados,
+          analisados: produtosParaIA.length
+        }
       };
     }
 

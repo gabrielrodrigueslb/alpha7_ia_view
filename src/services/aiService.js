@@ -84,12 +84,78 @@ function logResumoProdutos(etapa, produtos, limite = 5) {
   }
 }
 
-function selecionarProdutosParaIA(produtos) {
+function contarTokensCompativeis(tokensBusca, tokensProduto) {
+  const usados = new Set();
+  let total = 0;
+
+  tokensBusca.forEach(tokenBusca => {
+    const indiceCompativel = tokensProduto.findIndex((tokenProduto, idx) => (
+      !usados.has(idx) && tokensSaoCompativeis(tokenBusca, tokenProduto)
+    ));
+
+    if (indiceCompativel !== -1) {
+      usados.add(indiceCompativel);
+      total += 1;
+    }
+  });
+
+  return total;
+}
+
+function pontuarCandidatoParaIA(produto, contextoBusca) {
+  const termoBase = contextoBusca?.principioAtivoBusca || contextoBusca?.termoBuscaPrincipal || contextoBusca?.termoBusca || '';
+  const tokensBusca = extrairTokensAtivo(termoBase);
+  const tokensProduto = [
+    ...extrairTokensAtivo(produto?.principioativo_nome),
+    ...extrairTokensAtivo(produto?.descricao)
+  ];
+  const classificacaoSolicitada = obterClassificacaoSolicitada(contextoBusca?.intencaoClassificacao);
+  const buscaComposta = ehBuscaComposta(contextoBusca?.termoBusca);
+  const compatibilidades = contarTokensCompativeis(tokensBusca, tokensProduto);
+  let score = scoreBase(produto);
+
+  if (tokensBusca.length > 0) {
+    score += compatibilidades * 50;
+
+    if (compatibilidades === tokensBusca.length) {
+      score += 180;
+    } else if (compatibilidades === 0) {
+      score -= 220;
+    }
+  }
+
+  if (!buscaComposta) {
+    score += produtoTemMultiplosPrincipios(produto) ? -40 : 35;
+  }
+
+  if (classificacaoSolicitada) {
+    const tipoClassificacao = String(produto?.tipo_classificacao_canonica || '').trim().toUpperCase();
+    if (tipoClassificacao === classificacaoSolicitada) {
+      score += 45;
+    } else if (tipoClassificacao && tipoClassificacao !== 'DESCONHECIDO') {
+      score -= 25;
+    }
+  }
+
+  return score;
+}
+
+function selecionarProdutosParaIA(produtos, contextoBusca) {
   const lista = Array.isArray(produtos) ? produtos : [];
-  const produtosComScore = lista.filter(produto => scoreBase(produto) > 0);
-  const base = lista;
+  const pontuados = lista
+    .map(produto => ({
+      produto,
+      scoreSelecaoIA: pontuarCandidatoParaIA(produto, contextoBusca)
+    }))
+    .sort((a, b) => {
+      return b.scoreSelecaoIA - a.scoreSelecaoIA
+        || scoreBase(b.produto) - scoreBase(a.produto)
+        || String(a.produto?.descricao || '').localeCompare(String(b.produto?.descricao || ''));
+    });
+  const limite = pontuados.length > MAX_PRODUTOS_IA ? MAX_PRODUTOS_IA : pontuados.length;
+  const base = pontuados.slice(0, limite).map(item => item.produto);
   console.log(
-    `[ETAPA 4] Selecionando lote para IA | total=${lista.length} | com_score=${produtosComScore.length} | base=${base.length}`
+    `[ETAPA 4] Selecionando lote para IA | total=${lista.length} | selecionados=${base.length}`
   );
   return base;
 }
@@ -523,7 +589,7 @@ async function ordenarPorIA(produtos, contextoBusca) {
   }
 
   try {
-    const produtosParaIA = selecionarProdutosParaIA(produtos);
+    const produtosParaIA = selecionarProdutosParaIA(produtos, contextoBusca);
     const lotes = dividirEmLotes(produtosParaIA, MAX_PRODUTOS_IA);
 
     if (produtosParaIA.length <= 1) {

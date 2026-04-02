@@ -1,5 +1,6 @@
 const { pool } = require('./pool');
 const { expandirAbreviacoes, gerarCondicoesBuscaComRanking } = require('../../abreviacoes');
+const { gerarVariacoesPrincipioAtivo } = require('../utils/searchUtils');
 
 const STOPWORDS_ATIVO = new Set([
   'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'sem', 'para', 'por',
@@ -670,7 +671,11 @@ async function buscarPorPrincipioAtivo(principioAtivo, formaFarmaceutica, variac
   console.log(`\n[ETAPA 2] Buscando por PRINCÍPIO ATIVO: "${principioAtivo}"`);
 
   try {
-    const principiosEncontrados = await buscarPrincipiosAtivosPorTermoFlexivel(principioAtivo);
+    const termosFlexiveis = [...new Set([
+      principioAtivo,
+      ...gerarVariacoesPrincipioAtivo(principioAtivo)
+    ].filter(Boolean))];
+    const principiosEncontrados = await buscarPrincipiosAtivosPorTermoFlexivel(termosFlexiveis);
 
     if (principiosEncontrados.length === 0) {
       console.log(`[ETAPA 2] Nenhum princípio ativo encontrado`);

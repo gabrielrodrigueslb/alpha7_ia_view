@@ -1,6 +1,258 @@
 const { pool } = require('./pool');
 const { expandirAbreviacoes, gerarCondicoesBuscaComRanking } = require('../../abreviacoes');
 
+const STOPWORDS_ATIVO = new Set([
+  'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'sem', 'para', 'por',
+  'mg', 'ml', 'mcg', 'g', 'ui', 'cp', 'cps', 'caps', 'comp'
+]);
+
+function normalizarTextoBusca(valor) {
+  return String(valor || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s/+.]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function extrairTokensBusca(valor) {
+  return normalizarTextoBusca(valor)
+    .split(' ')
+    .filter(token => token.length >= 3 && !STOPWORDS_ATIVO.has(token));
+}
+
+function tokensSaoCompativeis(tokenBusca, tokenCandidato) {
+  if (!tokenBusca || !tokenCandidato) {
+    return false;
+  }
+
+  if (tokenBusca === tokenCandidato) {
+    return true;
+  }
+
+  const menor = Math.min(tokenBusca.length, tokenCandidato.length);
+  if (menor < 4) {
+    return false;
+  }
+
+  return tokenBusca.startsWith(tokenCandidato) || tokenCandidato.startsWith(tokenBusca);
+}
+
+function pontuarNomePrincipioAtivo(nomePrincipio, termosBusca) {
+  const nomeNormalizado = normalizarTextoBusca(nomePrincipio);
+  const tokensNome = extrairTokensBusca(nomePrincipio);
+  let score = 0;
+
+  (termosBusca || []).forEach(termo => {
+    const termoNormalizado = normalizarTextoBusca(termo);
+    const tokensTermo = extrairTokensBusca(termo);
+
+    if (termoNormalizado && nomeNormalizado.includes(termoNormalizado)) {
+      score += 200;
+    }
+
+    let tokensCompativeis = 0;
+    tokensTermo.forEach(token => {
+      const combinou = tokensNome.some(tokenNome => tokensSaoCompativeis(token, tokenNome));
+      if (combinou) {
+        tokensCompativeis += 1;
+        score += 25;
+      }
+    });
+
+    if (tokensTermo.length > 0 && tokensCompativeis === tokensTermo.length) {
+      score += 80;
+    }
+  });
+
+  return score;
+}
+
+function adicionarFiltrosDescricao(queryProdutos, params, startIdx, { variacoesForma = [], variacoesConcentracao = [] } = {}) {
+  const filtros = [];
+  let indiceAtual = startIdx;
+
+  if (Array.isArray(variacoesForma) && variacoesForma.length > 0) {
+    const formaPlaceholders = variacoesForma.map((_, idx) => (
+      `(p.descricao ILIKE $${indiceAtual + idx} OR em.descricao ILIKE $${indiceAtual + idx})`
+    ));
+
+    filtros.push(`(${formaPlaceholders.join(' OR ')})`);
+    params.push(...variacoesForma.map(v => `%${v}%`));
+    indiceAtual += variacoesForma.length;
+  }
+
+  if (Array.isArray(variacoesConcentracao) && variacoesConcentracao.length > 0) {
+    const concentracaoPlaceholders = variacoesConcentracao.map((_, idx) => (
+      `(p.descricao ILIKE $${indiceAtual + idx} OR em.descricao ILIKE $${indiceAtual + idx})`
+    ));
+
+    filtros.push(`(${concentracaoPlaceholders.join(' OR ')})`);
+    params.push(...variacoesConcentracao.map(v => `%${v}%`));
+    indiceAtual += variacoesConcentracao.length;
+  }
+
+  if (filtros.length > 0) {
+    queryProdutos += ` AND ${filtros.join(' AND ')}`;
+  }
+
+  return queryProdutos;
+}
+
+function montarQueryBaseProdutosPorPrincipio(principioPlaceholders) {
+  return `
+    SELECT
+      p.id,
+      p.codigo,
+      p.descricao,
+      p.status,
+      p.registroms,
+      p.fabricanteid,
+      pa.id as principioativo_id,
+      pa.nome as principioativo_nome,
+      em.id as embalagem_id,
+      em.descricao as embalagem_descricao,
+      em.codigobarras
+    FROM produto p
+    INNER JOIN principioativo pa ON p.principioativoid = pa.id
+    INNER JOIN embalagem em ON em.produtoid = p.id
+    WHERE pa.id IN (${principioPlaceholders})
+      AND p.status = 'A'
+  `;
+}
+
+async function buscarProdutosPorPrincipioIdsComFallback(
+  principioIds,
+  {
+    variacoesForma = [],
+    variacoesConcentracao = [],
+    limite = 100,
+    etapaLog = 'ETAPA 2'
+  } = {}
+) {
+  const principioPlaceholders = principioIds.map((_, idx) => `$${idx + 1}`).join(',');
+  const filtrosProgressivos = [];
+  const filtrosVistos = new Set();
+
+  function registrarFiltro(nome, forma, concentracao) {
+    const formaNormalizada = Array.isArray(forma) ? forma.filter(Boolean) : [];
+    const concentracaoNormalizada = Array.isArray(concentracao) ? concentracao.filter(Boolean) : [];
+    const chave = JSON.stringify([formaNormalizada, concentracaoNormalizada]);
+
+    if (filtrosVistos.has(chave)) {
+      return;
+    }
+
+    filtrosVistos.add(chave);
+    filtrosProgressivos.push({
+      nome,
+      variacoesForma: formaNormalizada,
+      variacoesConcentracao: concentracaoNormalizada
+    });
+  }
+
+  if (variacoesForma.length > 0 && variacoesConcentracao.length > 0) {
+    registrarFiltro('forma_e_concentracao', variacoesForma, variacoesConcentracao);
+  }
+
+  if (variacoesForma.length > 0) {
+    registrarFiltro('forma', variacoesForma, []);
+  }
+
+  if (variacoesConcentracao.length > 0) {
+    registrarFiltro('concentracao', [], variacoesConcentracao);
+  }
+
+  registrarFiltro('sem_filtros', [], []);
+
+  for (const filtro of filtrosProgressivos) {
+    let queryProdutos = montarQueryBaseProdutosPorPrincipio(principioPlaceholders);
+    const params = [...principioIds];
+
+    queryProdutos = adicionarFiltrosDescricao(
+      queryProdutos,
+      params,
+      principioIds.length + 1,
+      filtro
+    );
+    queryProdutos += ` ORDER BY p.descricao LIMIT ${limite}`;
+
+    if (filtro.variacoesForma.length > 0) {
+      console.log(`[${etapaLog}] Filtrando por formas: ${filtro.variacoesForma.join(', ')}`);
+    }
+
+    if (filtro.variacoesConcentracao.length > 0) {
+      console.log(`[${etapaLog}] Filtrando por concentracoes: ${filtro.variacoesConcentracao.join(', ')}`);
+    }
+
+    const resultado = await pool.query(queryProdutos, params);
+    if (resultado.rows.length > 0) {
+      if (filtro.nome !== 'sem_filtros') {
+        console.log(
+          `[${etapaLog}] Encontrados ${resultado.rows.length} produtos com filtro ${filtro.nome}`
+        );
+      }
+
+      return {
+        rows: resultado.rows,
+        filtroAplicado: filtro.nome
+      };
+    }
+
+    if (filtro.nome !== 'sem_filtros') {
+      console.log(`[${etapaLog}] Nenhum produto com filtro ${filtro.nome}, relaxando busca...`);
+    }
+  }
+
+  return {
+    rows: [],
+    filtroAplicado: 'sem_resultados'
+  };
+}
+
+async function buscarPrincipiosAtivosPorTermoFlexivel(termosBusca, limite = 30) {
+  const listaTermos = [...new Set(
+    (Array.isArray(termosBusca) ? termosBusca : [termosBusca])
+      .map(item => String(item || '').trim())
+      .filter(Boolean)
+  )];
+
+  const tokens = [...new Set(listaTermos.flatMap(extrairTokensBusca))];
+  if (tokens.length === 0) {
+    return [];
+  }
+
+  const nomeNormalizado = `
+    lower(
+      translate(
+        coalesce(nome, ''),
+        'ÁÀÃÂÄáàãâäÉÈÊËéèêëÍÌÎÏíìîïÓÒÕÔÖóòõôöÚÙÛÜúùûüÇç',
+        'AAAAAaaaaaEEEEeeeeIIIIiiiiOOOOOoooooUUUUuuuuCc'
+      )
+    )
+  `;
+
+  const condicoes = tokens.map((_, idx) => `${nomeNormalizado} LIKE $${idx + 1}`).join(' OR ');
+  const params = tokens.map(token => `%${token}%`);
+
+  const resultado = await pool.query(`
+    SELECT DISTINCT id, nome
+    FROM principioativo
+    WHERE ${condicoes}
+    ORDER BY nome
+    LIMIT 250
+  `, params);
+
+  return resultado.rows
+    .map(row => ({
+      ...row,
+      score_flexivel: pontuarNomePrincipioAtivo(row.nome, listaTermos)
+    }))
+    .filter(row => row.score_flexivel > 0)
+    .sort((a, b) => b.score_flexivel - a.score_flexivel || String(a.nome).localeCompare(String(b.nome)))
+    .slice(0, limite);
+}
+
 async function buscarPrecosEOfertas(embalagemIds, unidadeNegocioId) {
   console.log(`\n[PREÇOS] Buscando preços e ofertas para ${embalagemIds.length} embalagens...`);
 
@@ -191,18 +443,14 @@ async function buscarPorDescricao(termoBusca) {
   }
 }
 
-async function buscarPorPrincipioAtivo(principioAtivo, formaFarmaceutica, variacoesForma) {
+async function buscarPorPrincipioAtivoLegado(principioAtivo, formaFarmaceutica, variacoesForma, variacoesConcentracao = []) {
   console.log(`\n[ETAPA 2] Buscando por PRINCÍPIO ATIVO: "${principioAtivo}"`);
 
   try {
-    const resultadoPrincipios = await pool.query(`
-      SELECT DISTINCT id, nome 
-      FROM principioativo 
-      WHERE nome ILIKE $1
-      ORDER BY nome
-    `, [`%${principioAtivo}%`]);
+    const resultadoPrincipios = { rows: [] };
+    const principiosEncontrados = (resultadoPrincipios.rows = await buscarPrincipiosAtivosPorTermoFlexivel(principioAtivo));
 
-    if (resultadoPrincipios.rows.length === 0) {
+    if (principiosEncontrados.length === 0) {
       console.log(`[ETAPA 2] ❌ Nenhum princípio ativo encontrado`);
       return {
         encontrado: false,
@@ -213,8 +461,6 @@ async function buscarPorPrincipioAtivo(principioAtivo, formaFarmaceutica, variac
     }
 
     console.log(`[ETAPA 2] 📋 Encontrados ${resultadoPrincipios.rows.length} princípios ativos`);
-    const principiosEncontrados = resultadoPrincipios.rows;
-
     const principioIds = principiosEncontrados.map(p => p.id);
     const principioPlaceholders = principioIds.map((_, idx) => `$${idx + 1}`).join(',');
 
@@ -311,7 +557,7 @@ async function buscarPorPrincipioAtivo(principioAtivo, formaFarmaceutica, variac
   }
 }
 
-async function buscarPorPrincipioAtivoIds(principioIds, formaFarmaceutica, variacoesForma) {
+async function buscarPorPrincipioAtivoIdsLegado(principioIds, formaFarmaceutica, variacoesForma, variacoesConcentracao = []) {
   if (!Array.isArray(principioIds) || principioIds.length === 0) {
     return {
       encontrado: false,
@@ -410,6 +656,103 @@ async function buscarPorPrincipioAtivoIds(principioIds, formaFarmaceutica, varia
   }
 }
 
+function construirMetodoPrincipioAtivo(baseMetodo, filtroAplicado) {
+  if (!filtroAplicado || filtroAplicado === 'sem_resultados') {
+    return baseMetodo;
+  }
+
+  return filtroAplicado === 'sem_filtros'
+    ? `${baseMetodo}_sem_filtros`
+    : `${baseMetodo}_${filtroAplicado}`;
+}
+
+async function buscarPorPrincipioAtivo(principioAtivo, formaFarmaceutica, variacoesForma, variacoesConcentracao = []) {
+  console.log(`\n[ETAPA 2] Buscando por PRINCÍPIO ATIVO: "${principioAtivo}"`);
+
+  try {
+    const principiosEncontrados = await buscarPrincipiosAtivosPorTermoFlexivel(principioAtivo);
+
+    if (principiosEncontrados.length === 0) {
+      console.log(`[ETAPA 2] Nenhum princípio ativo encontrado`);
+      return {
+        encontrado: false,
+        produtos: [],
+        principiosEncontrados: [],
+        metodo: 'principio_ativo'
+      };
+    }
+
+    console.log(`[ETAPA 2] Encontrados ${principiosEncontrados.length} princípios ativos`);
+    const principioIds = principiosEncontrados.map(principio => principio.id);
+    const resultadoProdutos = await buscarProdutosPorPrincipioIdsComFallback(principioIds, {
+      variacoesForma,
+      variacoesConcentracao,
+      limite: 100,
+      etapaLog: 'ETAPA 2'
+    });
+
+    if (resultadoProdutos.rows.length > 0) {
+      console.log(`[ETAPA 2] Encontrados ${resultadoProdutos.rows.length} produtos`);
+      return {
+        encontrado: true,
+        produtos: resultadoProdutos.rows,
+        principiosEncontrados,
+        metodo: construirMetodoPrincipioAtivo('principio_ativo', resultadoProdutos.filtroAplicado)
+      };
+    }
+
+    console.log(`[ETAPA 2] Nenhum produto encontrado`);
+    return {
+      encontrado: false,
+      produtos: [],
+      principiosEncontrados,
+      metodo: 'principio_ativo'
+    };
+  } catch (error) {
+    console.error(`[ETAPA 2] Erro:`, error.message);
+    throw error;
+  }
+}
+
+async function buscarPorPrincipioAtivoIds(principioIds, formaFarmaceutica, variacoesForma, variacoesConcentracao = []) {
+  if (!Array.isArray(principioIds) || principioIds.length === 0) {
+    return {
+      encontrado: false,
+      produtos: [],
+      metodo: 'principio_ativo_por_ids'
+    };
+  }
+
+  console.log(`\n[ETAPA 2B] Expandindo por PRINCIPIO ATIVO IDs: ${principioIds.join(', ')}`);
+
+  try {
+    const resultadoProdutos = await buscarProdutosPorPrincipioIdsComFallback(principioIds, {
+      variacoesForma,
+      variacoesConcentracao,
+      limite: 200,
+      etapaLog: 'ETAPA 2B'
+    });
+
+    if (resultadoProdutos.rows.length > 0) {
+      console.log(`[ETAPA 2B] Encontrados ${resultadoProdutos.rows.length} produtos`);
+      return {
+        encontrado: true,
+        produtos: resultadoProdutos.rows,
+        metodo: construirMetodoPrincipioAtivo('principio_ativo_por_ids', resultadoProdutos.filtroAplicado)
+      };
+    }
+
+    return {
+      encontrado: false,
+      produtos: [],
+      metodo: 'principio_ativo_por_ids'
+    };
+  } catch (error) {
+    console.error(`[ETAPA 2B] Erro:`, error.message);
+    throw error;
+  }
+}
+
 async function verificarDisponibilidade(produtos, unidadeNegocioId) {
   console.log(`\n[ETAPA 3] Verificando DISPONIBILIDADE de ${produtos.length} produtos...`);
 
@@ -463,5 +806,6 @@ module.exports = {
   buscarPorDescricao,
   buscarPorPrincipioAtivo,
   buscarPorPrincipioAtivoIds,
+  buscarPrincipiosAtivosPorTermoFlexivel,
   verificarDisponibilidade
 };

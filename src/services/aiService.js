@@ -4,6 +4,10 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const MAX_PRODUTOS_IA = 20;
 const REGEX_TERMO_COMPOSTO = /\b(composto|composta|associado|associada|combinado|combinada|plus)\b/i;
+const STOPWORDS_ATIVO = new Set([
+  'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'sem', 'para', 'por',
+  'mg', 'ml', 'mcg', 'g', 'ui', 'cp', 'cps', 'caps', 'comp', 'comprimido', 'comprimidos'
+]);
 
 function scoreBase(produto) {
   const score = Number(produto?.relevancia_descricao ?? 0);
@@ -24,6 +28,29 @@ function normalizarTexto(valor) {
     .replace(/[^a-z0-9+\s/]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function extrairTokensAtivo(valor) {
+  return normalizarTexto(valor)
+    .split(' ')
+    .filter(token => token.length >= 3 && !STOPWORDS_ATIVO.has(token));
+}
+
+function tokensSaoCompativeis(tokenBusca, tokenProduto) {
+  if (!tokenBusca || !tokenProduto) {
+    return false;
+  }
+
+  if (tokenBusca === tokenProduto) {
+    return true;
+  }
+
+  const menor = Math.min(tokenBusca.length, tokenProduto.length);
+  if (menor < 4) {
+    return false;
+  }
+
+  return tokenBusca.startsWith(tokenProduto) || tokenProduto.startsWith(tokenBusca);
 }
 
 function descreverProdutoParaLog(produto) {
@@ -194,26 +221,31 @@ function produtoTemMultiplosPrincipios(produto) {
   return principioAtivo.includes('+') || /\b e \b/.test(principioAtivo);
 }
 
-function produtoCombinaComPrincipioSimples(produto, principioAtivoBusca, termoBusca) {
-  const principioBusca = normalizarTexto(principioAtivoBusca);
-  if (!principioBusca) {
+function produtoCombinaComPrincipioSimples(produto, principioAtivoBusca, termoBusca, permitirCompostos = false) {
+  const tokensBusca = extrairTokensAtivo(principioAtivoBusca);
+  if (tokensBusca.length === 0) {
     return true;
   }
 
-  const principioProduto = normalizarTexto(produto?.principioativo_nome);
-  const descricaoProduto = normalizarTexto(produto?.descricao);
+  const tokensProduto = [
+    ...extrairTokensAtivo(produto?.principioativo_nome),
+    ...extrairTokensAtivo(produto?.descricao)
+  ];
   const buscaComposta = ehBuscaComposta(termoBusca);
 
-  if (!principioProduto && !descricaoProduto) {
+  if (tokensProduto.length === 0) {
     return true;
   }
 
-  const contemPrincipioBusca = principioProduto.includes(principioBusca) || descricaoProduto.includes(principioBusca);
+  const contemPrincipioBusca = tokensBusca.every(tokenBusca => (
+    tokensProduto.some(tokenProduto => tokensSaoCompativeis(tokenBusca, tokenProduto))
+  ));
+
   if (!contemPrincipioBusca) {
     return false;
   }
 
-  if (!buscaComposta && produtoTemMultiplosPrincipios(produto)) {
+  if (!permitirCompostos && !buscaComposta && produtoTemMultiplosPrincipios(produto)) {
     return false;
   }
 
@@ -263,14 +295,24 @@ function produtoCombinaComClassificacaoSolicitada(produto, intencaoClassificacao
 }
 
 function aplicarRegrasDeterministicas(produto, contextoBusca) {
-  const { principioAtivoBusca, termoBusca, intencaoClassificacao } = contextoBusca || {};
+  const {
+    principioAtivoBusca,
+    termoBusca,
+    intencaoClassificacao,
+    permitirCompostosComoAlternativa
+  } = contextoBusca || {};
   const relacionadoAtual = produto?.relacionado_busca;
 
   if (relacionadoAtual !== true) {
     return produto;
   }
 
-  if (!produtoCombinaComPrincipioSimples(produto, principioAtivoBusca, termoBusca)) {
+  if (!produtoCombinaComPrincipioSimples(
+    produto,
+    principioAtivoBusca,
+    termoBusca,
+    permitirCompostosComoAlternativa === true
+  )) {
     console.log(
       `[ETAPA 4] Override deterministico: produto marcado como nao relacionado ` +
       `| motivo=principio_ativo_composto_ou_divergente | ${descreverProdutoParaLog(produto)}`

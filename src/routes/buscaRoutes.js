@@ -1,9 +1,19 @@
 const express = require('express');
-const { buscarPorDescricao, buscarPorPrincipioAtivo, buscarPorPrincipioAtivoIds, verificarDisponibilidade } = require('../db/queries');
+const {
+  buscarPorDescricao,
+  buscarPorPrincipioAtivo,
+  buscarPorPrincipioAtivoIds,
+  buscarPrincipiosAtivosPorTermoFlexivel,
+  verificarDisponibilidade
+} = require('../db/queries');
 const { enriquecerClassificacaoCanonica } = require('../db/classificacaoQueries');
 const { ordenarPorIA } = require('../services/aiService');
 const { analisarNecessidadeDeClarificacao } = require('../services/clarificacaoService');
-const { extrairFormaFarmaceutica } = require('../utils/searchUtils');
+const {
+  extrairContextoBuscaMedicamento,
+  gerarVariacoesPrincipioAtivo,
+  normalizarTextoBusca: normalizarTextoBuscaMedicamento
+} = require('../utils/searchUtils');
 
 const router = express.Router();
 
@@ -15,7 +25,8 @@ const REGEX_TERMO_GENERICO_TESTE = /\b(generico|genericos|gen)\b/i;
 const REGEX_TERMO_REFERENCIA_TESTE = /\b(referencia|referencias|ref|etico|etica|marca)\b/i;
 const REGEX_TERMO_SIMILAR_TESTE = /\b(similar|similares|sim)\b/i;
 const STOPWORDS_BUSCA = new Set([
-  'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'sem', 'para', 'por', 'na', 'no', 'nas', 'nos'
+  'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'sem', 'para', 'por', 'na', 'no', 'nas', 'nos',
+  'mg', 'ml', 'mcg', 'g', 'ui', 'cp', 'cps', 'caps', 'comp', 'comprimido', 'comprimidos'
 ]);
 
 function normalizarTextoBusca(valor) {
@@ -42,7 +53,7 @@ function limparTermoBuscaPrincipal(termo) {
     .replace(REGEX_TERMO_GENERICO, ' ')
     .replace(REGEX_TERMO_REFERENCIA, ' ')
     .replace(REGEX_TERMO_SIMILAR, ' ')
-    .replace(/\b(em|de|da|do|das|dos|na|no|nas|nos|com|para|por)\b/gi, ' ')
+    .replace(/\b(em|de|da|do|das|dos|na|no|nas|nos|com|para|por|mg|ml|mcg|g|ui|cp|cps|caps|comp|comprimido|comprimidos)\b/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -144,6 +155,180 @@ function aplicarFiltroPorIntencaoClassificacao(produtos, intencaoBusca) {
   };
 }
 
+function obterChaveProduto(produto) {
+  return `${produto?.id ?? 'sem_id'}::${produto?.embalagem_id ?? 'sem_embalagem'}`;
+}
+
+function tokensSaoCompativeis(tokenBusca, tokenProduto) {
+  if (!tokenBusca || !tokenProduto) {
+    return false;
+  }
+
+  if (tokenBusca === tokenProduto) {
+    return true;
+  }
+
+  const menor = Math.min(tokenBusca.length, tokenProduto.length);
+  if (menor < 4) {
+    return false;
+  }
+
+  return tokenBusca.startsWith(tokenProduto) || tokenProduto.startsWith(tokenBusca);
+}
+
+function extrairTokensAtivoBusca(termo) {
+  return normalizarTextoBuscaMedicamento(termo)
+    .split(' ')
+    .filter(token => token.length >= 3 && !STOPWORDS_BUSCA.has(token));
+}
+
+function pontuarProdutoPorPrincipioAtivo(produto, principioAtivoBase, tipoSolicitado) {
+  const tokensBusca = extrairTokensAtivoBusca(principioAtivoBase);
+  const textoProduto = `${produto?.principioativo_nome || ''} ${produto?.descricao || ''}`;
+  const tokensProduto = extrairTokensAtivoBusca(textoProduto);
+  let score = Number(produto?.relevancia_descricao || 0);
+
+  if (tokensBusca.length > 0) {
+    const todosCompatíveis = tokensBusca.every(tokenBusca => (
+      tokensProduto.some(tokenProduto => tokensSaoCompativeis(tokenBusca, tokenProduto))
+    ));
+
+    if (todosCompatíveis) {
+      score += 120;
+    }
+
+    tokensBusca.forEach(tokenBusca => {
+      const combinacoes = tokensProduto.filter(tokenProduto => tokensSaoCompativeis(tokenBusca, tokenProduto)).length;
+      score += combinacoes * 12;
+    });
+  }
+
+  if (!String(produto?.principioativo_nome || '').includes('+')) {
+    score += 20;
+  } else {
+    score -= 10;
+  }
+
+  if (tipoSolicitado && produto?.tipo_classificacao_canonica === tipoSolicitado) {
+    score += 35;
+  }
+
+  return score;
+}
+
+function ordenarProdutosPorPrincipioAtivo(produtos, principioAtivoBase, intencaoBusca) {
+  const tipoSolicitado = obterTipoClassificacaoSolicitada(intencaoBusca);
+
+  return [...(produtos || [])]
+    .map(produto => ({
+      ...produto,
+      relevancia_descricao: pontuarProdutoPorPrincipioAtivo(produto, principioAtivoBase, tipoSolicitado)
+    }))
+    .sort((a, b) => {
+      const scoreA = Number(a?.relevancia_descricao || 0);
+      const scoreB = Number(b?.relevancia_descricao || 0);
+      return scoreB - scoreA || String(a?.descricao || '').localeCompare(String(b?.descricao || ''));
+    });
+}
+
+async function prepararProdutosRecuperados(produtos, unidadeNegocioId, intencaoBusca, principioAtivoBase) {
+  let lista = ordenarProdutosPorPrincipioAtivo(produtos, principioAtivoBase, intencaoBusca);
+
+  if (lista.length > 0) {
+    lista = await verificarDisponibilidade(lista, unidadeNegocioId);
+  }
+
+  if (lista.length > 0) {
+    lista = await enriquecerClassificacaoCanonica(lista);
+  }
+
+  if (lista.length > 0) {
+    const resultadoFiltroClassificacao = aplicarFiltroPorIntencaoClassificacao(lista, intencaoBusca);
+    lista = resultadoFiltroClassificacao.produtos;
+  }
+
+  return ordenarProdutosPorPrincipioAtivo(lista, principioAtivoBase, intencaoBusca);
+}
+
+async function executarFallbackPorPrincipioAtivo({
+  termoBusca,
+  termoBuscaPrincipal,
+  principioAtivoBusca,
+  principioAtivoResolvido,
+  produtosAtuais,
+  formaFarmaceutica,
+  variacoesForma,
+  variacoesConcentracao,
+  unidadeNegocioId,
+  intencaoBusca
+}) {
+  const termosBase = [
+    principioAtivoResolvido,
+    principioAtivoBusca,
+    termoBuscaPrincipal,
+    termoBusca
+  ].filter(Boolean);
+  const variacoes = [...new Set(termosBase.flatMap(gerarVariacoesPrincipioAtivo))];
+  const principiosAtivos = await buscarPrincipiosAtivosPorTermoFlexivel([...termosBase, ...variacoes], 40);
+  const idsAtuais = (produtosAtuais || [])
+    .map(produto => produto?.principioativo_id)
+    .filter(id => id !== null && id !== undefined);
+  const principioIds = [...new Set([...idsAtuais, ...principiosAtivos.map(item => item.id)])];
+
+  if (principioIds.length === 0) {
+    return {
+      aplicado: false,
+      produtos: [],
+      resultadoIA: null,
+      principiosAtivos,
+      principioIds
+    };
+  }
+
+  const resultadoBuscaIds = await buscarPorPrincipioAtivoIds(
+    principioIds.slice(0, 40),
+    formaFarmaceutica,
+    variacoesForma,
+    variacoesConcentracao
+  );
+
+  if (!resultadoBuscaIds.encontrado) {
+    return {
+      aplicado: false,
+      produtos: [],
+      resultadoIA: null,
+      principiosAtivos,
+      principioIds
+    };
+  }
+
+  const produtosPreparados = await prepararProdutosRecuperados(
+    resultadoBuscaIds.produtos.map(produto => ({ ...produto, origem: 'fallback_principio_ativo' })),
+    unidadeNegocioId,
+    intencaoBusca,
+    principioAtivoResolvido || principioAtivoBusca || termoBuscaPrincipal
+  );
+
+  const resultadoIA = await ordenarPorIA(produtosPreparados, {
+    termoBusca,
+    termoBuscaPrincipal,
+    principioAtivoBusca: principioAtivoResolvido || principioAtivoBusca || termoBuscaPrincipal,
+    formaFarmaceutica,
+    intencaoClassificacao: intencaoBusca,
+    permitirCompostosComoAlternativa: true,
+    modoFallbackPrincipioAtivo: true
+  });
+
+  return {
+    aplicado: true,
+    produtos: resultadoIA.produtos,
+    resultadoIA,
+    principiosAtivos,
+    principioIds,
+    metodo: resultadoBuscaIds.metodo
+  };
+}
+
 function descreverProdutoParaLog(produto) {
   if (!produto) {
     return 'produto indefinido';
@@ -215,9 +400,18 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
     console.log(`========================================`);
 
     const intencaoBusca = detectarIntencaoBusca(termoBusca);
-    const { principioAtivoBusca: principioAtivoExtraido, formaFarmaceutica, variacoesForma } = extrairFormaFarmaceutica(termoBusca);
-    const termoBuscaPrincipal = limparTermoBuscaPrincipal(principioAtivoExtraido)
+    const {
+      principioAtivoBusca: principioAtivoExtraido,
+      termoBuscaLimpo,
+      formaFarmaceutica,
+      variacoesForma,
+      concentracoesBusca,
+      variacoesConcentracao
+    } = extrairContextoBuscaMedicamento(termoBusca);
+    const termoBuscaPrincipal = limparTermoBuscaPrincipal(termoBuscaLimpo)
+      || limparTermoBuscaPrincipal(principioAtivoExtraido)
       || limparTermoBuscaPrincipal(termoBusca)
+      || termoBuscaLimpo
       || principioAtivoExtraido
       || termoBusca;
     let principioAtivoBusca = termoBuscaPrincipal;
@@ -232,13 +426,17 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
     console.log(`[INFO] Princípio ativo extraído: "${principioAtivoBusca}"`);
     console.log(`[INFO] Forma farmacêutica: "${formaFarmaceutica || 'nenhuma'}"`);
 
+    if (concentracoesBusca.length > 0) {
+      console.log(`[INFO] Concentracoes: ${concentracoesBusca.join(' | ')}`);
+    }
+
     let produtosPrincipioAtivo = [];
     let produtosDescricao = [];
     let principiosEncontrados = [];
     let metodosUtilizados = [];
 
     let [resultadoPrincipioAtivo, resultadoDescricao] = await Promise.all([
-      buscarPorPrincipioAtivo(principioAtivoBusca, formaFarmaceutica, variacoesForma),
+      buscarPorPrincipioAtivo(principioAtivoBusca, formaFarmaceutica, variacoesForma, variacoesConcentracao),
       buscarPorDescricao(termoBuscaPrincipal)
     ]);
 
@@ -287,7 +485,8 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
       const resultadoPrincipioAtivoResolvido = await buscarPorPrincipioAtivo(
         principioAtivoResolvido,
         formaFarmaceutica,
-        variacoesForma
+        variacoesForma,
+        variacoesConcentracao
       );
 
       if (resultadoPrincipioAtivoResolvido.encontrado) {
@@ -312,7 +511,8 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
       const resultadoExpandidoPorPrincipio = await buscarPorPrincipioAtivoIds(
         principioAtivoIdsDaDescricao.slice(0, 10),
         formaFarmaceutica,
-        variacoesForma
+        variacoesForma,
+        variacoesConcentracao
       );
 
       if (resultadoExpandidoPorPrincipio.encontrado) {
@@ -401,6 +601,45 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
       avaliadoPorIA = resultadoIA.avaliado === true;
       estatisticasIA = resultadoIA.estatisticasIA || estatisticasIA;
       logResumoProdutos('Produtos apos marcacao da IA', produtos);
+    }
+
+    if (produtos.length > 0 && avaliadoPorIA && estatisticasIA.aprovados === 0) {
+      console.log('[INFO] IA zerou relacionados - iniciando fallback por principio ativo + IDs');
+      const resultadoFallback = await executarFallbackPorPrincipioAtivo({
+        termoBusca,
+        termoBuscaPrincipal,
+        principioAtivoBusca,
+        principioAtivoResolvido,
+        produtosAtuais: produtos,
+        formaFarmaceutica,
+        variacoesForma,
+        variacoesConcentracao,
+        unidadeNegocioId,
+        intencaoBusca
+      });
+
+      if (resultadoFallback.aplicado) {
+        const aprovadosFallback = resultadoFallback.resultadoIA?.estatisticasIA?.aprovados || 0;
+        console.log(
+          `[INFO] Fallback por principio ativo retornou ${resultadoFallback.produtos.length} produto(s) ` +
+          `| relacionados=${aprovadosFallback}`
+        );
+
+        if (aprovadosFallback > 0) {
+          produtos = resultadoFallback.produtos;
+          ordenadoPorIA = resultadoFallback.resultadoIA.ordenado;
+          filtradoPorIA = resultadoFallback.resultadoIA.filtrado;
+          avaliadoPorIA = resultadoFallback.resultadoIA.avaliado === true;
+          estatisticasIA = resultadoFallback.resultadoIA.estatisticasIA || estatisticasIA;
+          metodosUtilizados.push('fallback_principio_ativo_ids');
+          if (resultadoFallback.metodo) {
+            metodosUtilizados.push(resultadoFallback.metodo);
+          }
+          logResumoProdutos('Produtos apos fallback por principio ativo', produtos);
+        } else {
+          console.log('[INFO] Fallback executado, mas sem ganho de relacionados aprovados');
+        }
+      }
     }
 
     const produtosParaClarificacao = produtos.filter(produto => produto.relacionado_busca !== false);

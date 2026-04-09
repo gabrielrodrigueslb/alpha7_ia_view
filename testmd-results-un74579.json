@@ -1,0 +1,1531 @@
+﻿[
+    {
+        "query":  "dipirona 1g",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "DIPIRONA",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_concentracao + descricao + principio_ativo_por_ids_concentracao + filtro_atributos_concentracao:1g",
+        "total":  8,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "DIPIRONA 1G 10CP(CIM)",
+                    "DIPIRONA 1G 10CP(EMS)",
+                    "DIPIRONA 1G 20CP(PRA)"
+                ]
+    },
+    {
+        "query":  "dipirona gotas",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "DIPIRONA",
+        "forma_farmaceutica":  "gotas",
+        "metodo":  "principio_ativo_forma + descricao + principio_ativo_por_ids_forma + filtro_atributos_forma:gotas|gts|gt|drops",
+        "total":  8,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ABERALGINA 500MG/ML GTS 20ML",
+                    "ATROVERAN DIP 500MG/ML GTS 20ML",
+                    "DIPIMED 500MG/ML GTS 10ML"
+                ]
+    },
+    {
+        "query":  "dipirona infantil gotas",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "DIPIRONA",
+        "forma_farmaceutica":  "gotas",
+        "metodo":  "principio_ativo_forma + descricao + principio_ativo_por_ids_forma + filtro_atributos_forma:gotas|gts|gt|drops",
+        "total":  7,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ABERALGINA 500MG/ML GTS 20ML",
+                    "DIPIMED 500MG/ML GTS 10ML",
+                    "DIPIMED 500MG/ML GTS 20ML"
+                ]
+    },
+    {
+        "query":  "paracetamol 750",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "PARACETAMOL",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  5,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "PARACETAMOL 750MG 20CP REV(EMS)",
+                    "PARACETAMOL 750MG 20CP(GLO)",
+                    "PARACETAMOL 750MG 20CP(MED)"
+                ]
+    },
+    {
+        "query":  "paracetamol infantil gotas",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "paracetamol infantil",
+        "forma_farmaceutica":  "gotas",
+        "metodo":  "principio_ativo_forma + descricao + filtro_atributos_forma:gotas|gts|gt|drops",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "PARACETAMOL 200MG/ML GTS 15ML(EMS)",
+                    "PARACETAMOL BEBE 100MG GTS 15(EMS)"
+                ]
+    },
+    {
+        "query":  "tylenol infantil",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "tylenol infantil",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  4,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "MASC OMRON INFANTIL NEB MSL 1UN",
+                    "MASCARA DESC INFANTIL C/10 HEL",
+                    "MASCARA DESC INFANTIL C/10 TUR"
+                ]
+    },
+    {
+        "query":  "ibuprofeno 600",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "IBUPROFENO",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "IBUPROFENO 600MG 20CP REV(PRA)",
+                    "IBUPROFENO 600MG 20CP REV(VIT)"
+                ]
+    },
+    {
+        "query":  "ibuprofeno infantil",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "IBUPROFENO",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "IBUPROFENO 100MG/ML GTS 20ML(MED)",
+                    "ALIVIUM 100MG/ML GTS 20ML",
+                    "IBUPRIL 100MG/ML GTS 20ML"
+                ]
+    },
+    {
+        "query":  "advil infantil",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "IBUPROFENO",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + principio_ativo_resolvido_descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "ALIVIUM 100MG/ML GTS 20ML",
+                    "IBUPRIL 100MG/ML GTS 20ML",
+                    "IBUPRIL 50MG/ML GTS 30ML"
+                ]
+    },
+    {
+        "query":  "dorflex com 10",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "DIPIRONA",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + principio_ativo_resolvido_descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  12,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "DORFLEX DIP 1G 10CP",
+                    "ABERALGINA 500MG/ML GTS 20ML",
+                    "ANADOR 1G 10CP"
+                ]
+    },
+    {
+        "query":  "neosaldina",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "neosaldina",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "NEOSALDINA ENV 10DRG",
+                    "DORALGINA ENV 4DRG",
+                    "DORFLEX MAX 8CP"
+                ]
+    },
+    {
+        "query":  "buscopan composto",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "BUTILBROMETO DE ESCOPOLAMINA",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + principio_ativo_resolvido_descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "BUSCOPAN COMPOSTO GTS 20ML"
+                ]
+    },
+    {
+        "query":  "luftal gotas",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "SIMETICONA",
+        "forma_farmaceutica":  "gotas",
+        "metodo":  "descricao + principio_ativo_resolvido_descricao + principio_ativo_por_ids_forma + filtro_atributos_forma:gotas|gts|gt|drops",
+        "total":  5,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "LUFTAL 75MG/ML CER GTS 15ML",
+                    "LUFTAL 75MG/ML CER GTS 30ML",
+                    "LUFTAL 75MG/ML GTS INF 15ML"
+                ]
+    },
+    {
+        "query":  "simeticona gotas",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "SIMETICONA",
+        "forma_farmaceutica":  "gotas",
+        "metodo":  "principio_ativo_forma + descricao + principio_ativo_por_ids_forma + filtro_atributos_forma:gotas|gts|gt|drops",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "SIMETICONA 75MG/ML GTS 10ML(ACH)",
+                    "SIMETICONA 75MG/ML GTS 10ML(AIR)",
+                    "SIMETICONA 75MG/ML GTS 15ML(ACH)"
+                ]
+    },
+    {
+        "query":  "omeprazol 20",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "OMEPRAZOL",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros + fallback_principio_ativo_ids + principio_ativo_por_ids_sem_filtros",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "NOVOPRAZOL 20MG 56CAP"
+                ]
+    },
+    {
+        "query":  "pantoprazol 40",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "PANTOPRAZOL",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "PANTOPRAZOL 40MG 28CP REV L.R(EUR)",
+                    "PANTOPRAZOL 40MG 42CP REV L.R(GER)"
+                ]
+    },
+    {
+        "query":  "loratadina 10mg",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "LORATADINA",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_concentracao + descricao + principio_ativo_por_ids_concentracao + filtro_atributos_concentracao:10mg",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "LORASLIV 10MG 12CP",
+                    "LORATAMED 10MG 12CP"
+                ]
+    },
+    {
+        "query":  "desloratadina xarope",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "DESLORATADINA",
+        "forma_farmaceutica":  "xarope",
+        "metodo":  "principio_ativo_forma + descricao + principio_ativo_por_ids_forma",
+        "total":  5,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "DESLORATADINA XPE 100ML(ACH)",
+                    "DESLORATADINA XPE 100ML(EUR)",
+                    "DESLORATADINA XPE 100ML(PRA)"
+                ]
+    },
+    {
+        "query":  "cetirizina",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "DICLORIDRATO DE LEVOCETIRIZINA",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "LEVOCETIRIZINA 5MG 10CP REV(GER)",
+                    "ZALERV 5MG 10CP REV",
+                    "ZINA ODT 5MG C/10 COMP "
+                ]
+    },
+    {
+        "query":  "allegra 120",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "CLORIDRATO DE FEXOFENADINA",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + principio_ativo_resolvido_descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ALLEGRA 120MG 10CP REV",
+                    "FEXOFENADINA 120MG 10CP REV(MED)",
+                    "FEXOFENADINA 120MG 10CP REV(RAN)"
+                ]
+    },
+    {
+        "query":  "polaramine xarope",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "MALEATO DE DEXCLORFENIRAMINA",
+        "forma_farmaceutica":  "xarope",
+        "metodo":  "descricao + principio_ativo_resolvido_descricao + principio_ativo_por_ids_forma + fallback_principio_ativo_ids + principio_ativo_por_ids_forma",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "HISTAMIN 0,4MG/ML XPE 100ML"
+                ]
+    },
+    {
+        "query":  "nimesulida 100",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "NIMESULIDA",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "NIMESULIDA 100MG 12CP(EMS)",
+                    "NIMESULIDA 100MG 12CP(GER)"
+                ]
+    },
+    {
+        "query":  "amoxicilina 500",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "amoxicilina 500",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "AMOXICILINA+CLAV POT 500+125MG 21CP R(SAN)",
+                    "AMOXICILINA 400MG/5ML 100ML(GER)",
+                    "AMOXICILINA 500MG 21CAP GEL D(EMS)"
+                ]
+    },
+    {
+        "query":  "azitromicina 500",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "AZITROMICINA",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "AZITROMICINA 500MG 3CP REV(EUR)",
+                    "AZITROMICINA 500MG 3CP REV(MED)"
+                ]
+    },
+    {
+        "query":  "soro fisiologico 500ml",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "soro fisiologico 500ml",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "soro de nariz",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "CLORETO DE SÓDIO",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "MARESIS BABY 0,9% 360 SP 100ML",
+                    "NASONEW 0,9% SPR 50ML",
+                    "RINOSORO XT 0,9% GTS NAS 30ML"
+                ]
+    },
+    {
+        "query":  "vitamina c efervescente",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "COLECALCIFEROL",
+        "forma_farmaceutica":  "efervescente",
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "VITAMINA D3 15.000UI GEL 4CAP(EUR)",
+                    "VITAMINA D3 50.000UI 4CAP MOLE(NEO)",
+                    "VITAMINA D3 50.000UI 8CAP MOLE(NEO)"
+                ]
+    },
+    {
+        "query":  "polivitaminico adulto",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "polivitaminico adulto",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "KIT NEBULIZACAO NS ADULTO",
+                    "NEUTROFER COLINA DHA 60CAP"
+                ]
+    },
+    {
+        "query":  "lavitan mulher",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "lavitan mulher",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "LAVITAN 50+ MULHER 60CP"
+                ]
+    },
+    {
+        "query":  "engov",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "engov",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ENGOV AFTER BERRY VIBES 250ML",
+                    "ENGOV AFTER CITRUS 250ML",
+                    "ENGOV AFTER PINK LEMON 250ML"
+                ]
+    },
+    {
+        "query":  "epocler",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "DIMENIDRINATO",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + principio_ativo_resolvido_descricao + principio_ativo_por_ids_sem_filtros + fallback_principio_ativo_ids + principio_ativo_por_ids_sem_filtros",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "DRAMIN 50MG ENV 1CAP GEL MOLE",
+                    "DRAMIN CAPSGEL 50MG 10CAP"
+                ]
+    },
+    {
+        "query":  "sal de fruta eno",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "sal fruta eno",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "SAL DE FRUTA ENO GUAR 100G",
+                    "SAL DE FRUTA ENO GUAR 2ENV 5G",
+                    "SAL DE FRUTA ENO LIM 2ENV 5G"
+                ]
+    },
+    {
+        "query":  "dramim",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "dramim",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "BENALET MEL+LIMAO 12PAST",
+                    "ENDCOFF MEL+LIM 12PAST",
+                    "ENDCOFF MENTA 12PAST"
+                ]
+    },
+    {
+        "query":  "melatonina",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "MELATONINA",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  8,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "MELATONINA 200MG 90CP OROD",
+                    "MELATONINA 500DOSES 20ML",
+                    "MELATONINA MARACUJA 30ML "
+                ]
+    },
+    {
+        "query":  "xarope pra tosse infantil",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "ACICLOVIR",
+        "forma_farmaceutica":  "xarope",
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ACICLOVIR 200MG 30CP(PRA)",
+                    "ACICLOVIR 50MG/G CR DERM 10G(PRA)",
+                    "ACICLOVIR 200MG 25CP(PHA)"
+                ]
+    },
+    {
+        "query":  "pastilha pra garganta",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "ACICLOVIR",
+        "forma_farmaceutica":  "pastilha",
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ACICLOVIR 200MG 30CP(PRA)",
+                    "ACICLOVIR 50MG/G CR DERM 10G(PRA)",
+                    "ACICLOVIR 200MG 25CP(PHA)"
+                ]
+    },
+    {
+        "query":  "pomada pra assadura",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "ACICLOVIR",
+        "forma_farmaceutica":  "pomada",
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "ACICLOVIR 50MG/G CR DERM 10G(PRA)",
+                    "ACICLOVIR 50MG/G CR DERM 10G(GER)"
+                ]
+    },
+    {
+        "query":  "hipoglos",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "hipoglos",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "HIPOGLOS CR PROT AMEND 80G",
+                    "HIPOGLOS CR PROT ORIG 40G",
+                    "HIPOGLOS POM ASSAD TRANSP 30G"
+                ]
+    },
+    {
+        "query":  "bepantol derma",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "bepantol derma",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  4,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "BEPANTOL DERMA CAB SOL 50ML",
+                    "BEPANTOL DERMA LAB REG 7,5ML",
+                    "BEPANTOL DERMA SPRAY HIDRATANTE 50ML"
+                ]
+    },
+    {
+        "query":  "pomada pra queimadura",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "ACICLOVIR",
+        "forma_farmaceutica":  "pomada",
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "ACICLOVIR 50MG/G CR DERM 10G(PRA)",
+                    "ACICLOVIR 50MG/G CR DERM 10G(GER)"
+                ]
+    },
+    {
+        "query":  "shampoo anticaspa",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "shampoo anticaspa",
+        "forma_farmaceutica":  "shampoo",
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "shampoo antiqueda",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "shampoo antiqueda",
+        "forma_farmaceutica":  "shampoo",
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "shampoo infantil johnsons",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "shampoo infantil johnsons",
+        "forma_farmaceutica":  "shampoo",
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "condicionador hidratacao",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "condicionador hidratacao",
+        "forma_farmaceutica":  "condicionador",
+        "metodo":  "descricao + filtro_atributos_forma:condicionador|cond|conditioner",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "V. CABELOS COND REC. DE HIDRATACAO 325ML",
+                    "COND DOVE HIDRAT HIALU VIT 190ML",
+                    "COND DOVE HIDRAT HIALU VIT 370ML"
+                ]
+    },
+    {
+        "query":  "mascara capilar hidratacao",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "mascara capilar hidratacao",
+        "forma_farmaceutica":  "mascara_capilar",
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "MASCARA CIR VABENE TR BRA 50UN",
+                    "MASCARA CIR VABENE TR ROS 50UN",
+                    "MASCARA DESC INFANTIL C/10 HEL"
+                ]
+    },
+    {
+        "query":  "sabonete em barra dove",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "sabonete em barra dove",
+        "forma_farmaceutica":  "sabonete",
+        "metodo":  "descricao + filtro_atributos_forma:sabonete|sab|soap",
+        "total":  5,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ACNEZIL SABONETE BARRA PELE ACNEICA 70G",
+                    "ACNEZIL SABONETE BARRA PELE OLEOSA 70G",
+                    "CORPO SABONETE CPO GLICE CARE 200ML"
+                ]
+    },
+    {
+        "query":  "sabonete liquido corporal",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "sabonete liquido corporal",
+        "forma_farmaceutica":  "sabonete",
+        "metodo":  "descricao + filtro_atributos_forma:sabonete|sab|soap",
+        "total":  4,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "CORPO SABONETE CPO GLICE CARE 200ML",
+                    "CORPO SABONETE CPO GLICE FRESH 200ML",
+                    "SAB LIQUIDO SNOOPY 200ML"
+                ]
+    },
+    {
+        "query":  "sabonete intimo",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "sabonete intimo",
+        "forma_farmaceutica":  "sabonete",
+        "metodo":  "descricao + filtro_atributos_forma:sabonete|sab|soap",
+        "total":  4,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ACNEZIL SABONETE BARRA PELE ACNEICA 70G",
+                    "ACNEZIL SABONETE BARRA PELE OLEOSA 70G",
+                    "CORPO SABONETE CPO GLICE CARE 200ML"
+                ]
+    },
+    {
+        "query":  "creme dental colgate",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "creme dental colgate",
+        "forma_farmaceutica":  "creme",
+        "metodo":  "descricao + filtro_atributos_forma:creme|cr|cremes|cream",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "CR DENT COLGATE LUM WH CAR 70G"
+                ]
+    },
+    {
+        "query":  "creme dental sensodyne",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "creme dental sensodyne",
+        "forma_farmaceutica":  "creme",
+        "metodo":  "descricao + filtro_atributos_forma:creme|cr|cremes|cream",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "CR DENT DENTALCL GEL BATM 100G",
+                    "CR DENT DENTALCL GEL PEPPA 100",
+                    "CR DENT DENTALCL PEP TUT-FR 50"
+                ]
+    },
+    {
+        "query":  "escova dental macia",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "escova dental macia",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ESC DENT ESCOLAR STITCH MACIA 1 UND",
+                    "ESC DENT INF MASHA+COPO MACIA 1UN",
+                    "ESC DENT JUVENIL STITCH L2P1 MACIA"
+                ]
+    },
+    {
+        "query":  "fio dental",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "fio dental",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "FIO DENTAL POWERDENT 100M MENTA C/CERA"
+                ]
+    },
+    {
+        "query":  "enxaguante bucal sem alcool",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "enxaguante bucal sem alcool",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  9,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ALCOOL 70% ANTISSEPTICO 30ML",
+                    "ALCOOL 70%GEL ASEPLYNE 92G",
+                    "ALCOOL 70%GEL ASEPLYNE AL VE 1L"
+                ]
+    },
+    {
+        "query":  "desodorante aerosol feminino",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "desodorante aerosol feminino",
+        "forma_farmaceutica":  "aerosol",
+        "metodo":  "descricao",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "OAZ REPELENTE AEROSOL 200ML"
+                ]
+    },
+    {
+        "query":  "desodorante roll on masculino",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "desodorante roll on masculino",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "DES REXONA MEN ROLL ACT 30ML",
+                    "DES REXONA MEN ROLL V8 50ML",
+                    "DES REXONA ROLL ACT EMOT 50ML"
+                ]
+    },
+    {
+        "query":  "hidratante corporal nivea",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "hidratante corporal nivea",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  8,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "CR BARB NIVEA ORIG 65G",
+                    "CR BARB NIVEA SENS 65G",
+                    "CR FAC NIVEA ANTISS 100G"
+                ]
+    },
+    {
+        "query":  "creme para maos",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "creme para maos",
+        "forma_farmaceutica":  "creme",
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "CR HID MAOS VULT 50G",
+                    "CR MONANGE MAOS Q10/VIT E 75G"
+                ]
+    },
+    {
+        "query":  "protetor solar fps 60",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "protetor solar fps 60",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "PROT OAZ SOLAR FPS 60 CRM 200ML",
+                    "KIT SUNLESS PROT F50 120G + KIDS FPS60 120G"
+                ]
+    },
+    {
+        "query":  "protetor solar infantil",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "protetor solar infantil",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  4,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "PROT OAZ SOLAR FPS50 BABY SHARK CR 125ML",
+                    "PROT OAZ SOLAR FPS50 BOB ESPONJ CR 125ML",
+                    "PROT SOLAR SUNLESS KIDS F50 120G"
+                ]
+    },
+    {
+        "query":  "protetor labial com fps",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "protetor labial com fps",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "PROT LAB MELTHEN FPS15 MENTA 3,5G",
+                    "PROT LAB MELTHEN FPS15 MOR 3,5G",
+                    "PROT LAB MELTHEN FPS15 TRAD 3,5G"
+                ]
+    },
+    {
+        "query":  "absorvente noturno com abas",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "absorvente noturno com abas",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  4,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ABS MODES NOTURNO PL C/ABAS 10UND",
+                    "ABS LADYSOFT MAX SUAVE C/ABAS 16UN",
+                    "ABS LADYSOFT NOT SUAVE C/ABAS 16UN"
+                ]
+    },
+    {
+        "query":  "absorvente diario",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "absorvente diario",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  15,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ABS ALWAYS NO G SUA AB 10UN",
+                    "ABS ALWAYS NO LON SUA AB 8UN",
+                    "ABS ALWAYS NOT 28CM SEC AB 16U"
+                ]
+    },
+    {
+        "query":  "lenco umedecido bebe",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "lenco umedecido bebe",
+        "forma_farmaceutica":  "lenco",
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "LENCO DE BOLSO KISS C/10"
+                ]
+    },
+    {
+        "query":  "fralda pampers g",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "fralda pampers g",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "fralda infantil m",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "fralda infantil m",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "fralda geriatrica m",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "fralda geriatrica m",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "cotonete caixa",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "cotonete caixa",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "algodao hidrofilo",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "algodao hidrofilo",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  8,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "ALGODAO HIDROF ROLO 500G TEXBOM",
+                    "ALGODAO BOLA 50G TEXBOM",
+                    "ALGODAO CREMER DISC 100UN"
+                ]
+    },
+    {
+        "query":  "agua oxigenada 10 volumes",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "agua oxigenada 10 volumes",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "AGUA OXIG 20V ALYNE CR 100ML",
+                    "AGUA OXIG 30V ALYNE CR 100ML",
+                    "AGUA OXIG 40V ALYNE CR 100ML"
+                ]
+    },
+    {
+        "query":  "removedor de esmalte",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "removedor",
+        "forma_farmaceutica":  "esmalte",
+        "metodo":  "nenhum método encontrou resultados",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "acetona",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "acetona",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao",
+        "total":  10,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "REMOV ALYNE S/ACETONA MOR 100M",
+                    "OMCILON A ORABASE 1MG/G 10G",
+                    "TRIANCINOLONA 1MG/G POM 10G(EMS)"
+                ]
+    },
+    {
+        "query":  "esmalte vermelho",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "vermelho",
+        "forma_farmaceutica":  "esmalte",
+        "metodo":  "principio_ativo_sem_filtros",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "IVERMECTINA 6MG 4CP(GER)",
+                    "IVERMECTINA 6MG 4CP(NEO)"
+                ]
+    },
+    {
+        "query":  "tinta de cabelo castanho escuro",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "tinta cabelo castanho escuro",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao",
+        "total":  13,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "BOZZANO CR CABELO 140G",
+                    "CABELOS CO WASH OND/CACHOS/CRESPOS 25",
+                    "CABELOS CR CAP DEFRIZANTE LISOS 100ML"
+                ]
+    },
+    {
+        "query":  "tinta loiro claro",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "tinta loiro claro",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "CHIP CLARO TURBO C/REC 1UN",
+                    "CLARO CHIP TC SN FLEX 1UN",
+                    "CLARITROMICINA 250MG/5ML 60ML(EMS)"
+                ]
+    },
+    {
+        "query":  "alcool 70 500ml",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "alcool 70 500ml",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento + filtro_atributos_medida:500ml",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ALCOOL GEL HYGEA 70% 500ML"
+                ]
+    },
+    {
+        "query":  "curativo band aid",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "curativo band aid",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "CUR BAND-AID SKIN-FL 25UN",
+                    "CUR BAND-AID TR 40UN",
+                    "CUR BAND-AID TR VAR 30UN"
+                ]
+    },
+    {
+        "query":  "gaze esteril",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "gaze esteril",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "COMP DE GAZE ALGODONADA CURAT.",
+                    "COMP DE GAZE CONVIVA C/10",
+                    "COMP GAZE HERIKA 7,5X7,5 10UN(AME)"
+                ]
+    },
+    {
+        "query":  "compressa de gaze",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "compressa de gaze",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "COMP DE GAZE ALGODONADA CURAT.",
+                    "COMP DE GAZE CONVIVA C/10",
+                    "COMP GAZE HERIKA 7,5X7,5 10UN(AME)"
+                ]
+    },
+    {
+        "query":  "esparadrapo 10cm",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "esparadrapo 10cm",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ATAD. DE CREPON EST.10CMX1,8M"
+                ]
+    },
+    {
+        "query":  "micropore",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "micropore",
+        "forma_farmaceutica":  null,
+        "metodo":  "nenhum método encontrou resultados",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "termometro digital",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "termometro digital",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  4,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "TERMOMETRO G-TECH DIG BR 1UN",
+                    "TERMOMETRO G-TECH DIG LAR 1UN",
+                    "TERMOMETRO G-TECH DIG ROS 1UN"
+                ]
+    },
+    {
+        "query":  "mascara descartavel",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "mascara descartavel",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  6,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "MASCARA CIR DESC DESCAR 50 UNI",
+                    "MASCARA DESC INFANTIL C/10 HEL",
+                    "MASCARA DESC INFANTIL C/10 TUR"
+                ]
+    },
+    {
+        "query":  "repelente spray",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "repelente spray",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "OAZ REPELENTE AEROSOL 200ML",
+                    "CALADRYL REPELENTE 100ML"
+                ]
+    },
+    {
+        "query":  "repelente infantil",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "repelente infantil",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + filtro_categoria_nao_medicamento_descricao + filtro_categoria_nao_medicamento",
+        "total":  2,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "OAZ REPELENTE INFANTIL 8H 100ML ",
+                    "CALADRYL REPELENTE 100ML"
+                ]
+    },
+    {
+        "query":  "preservativo skin",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "DESONIDA",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + principio_ativo_resolvido_descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "DESONIDA 0,5MG/G POM DERM 30G(GER)"
+                ]
+    },
+    {
+        "query":  "lubrificante intimo",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "lubrificante intimo",
+        "forma_farmaceutica":  null,
+        "metodo":  "nenhum método encontrou resultados",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "teste de gravidez",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "teste gravidez",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao",
+        "total":  7,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "TESTE DE GRAVIDEZ CONSTATE TIRA",
+                    "TESTE GRAV CLEARBLUE PL CAN 2U",
+                    "TESTE GRAV CLEARBLUE PLUS CAN 1U"
+                ]
+    },
+    {
+        "query":  "aparelho de pressao digital",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "aparelho pressao digital",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  5,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "AP PRESSAO G-TECH DIG BRAÇO AUTOM BSP UN",
+                    "AP PRESSAO G-TECH DIG PUL 3D 1",
+                    "AP PRESSAO MULTIL PUL HC204 1U"
+                ]
+    },
+    {
+        "query":  "inalador nebulizador",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "inalador nebulizador",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "seringa 5ml",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "AMOXICILINA",
+        "forma_farmaceutica":  "seringa",
+        "metodo":  "descricao + principio_ativo_resolvido_descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "AMOXICILINA 400MG/5ML 100ML(GER)"
+                ]
+    },
+    {
+        "query":  "luva descartavel",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "luva descartavel",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "bolsa termica gel",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "bolsa termica",
+        "forma_farmaceutica":  "gel",
+        "metodo":  "descricao + filtro_atributos_forma:gel|gels|geleia",
+        "total":  3,
+        "correcao":  false,
+        "ambigua":  true,
+        "clarificar":  true,
+        "top":  [
+                    "BOLSA TERMICA CREMER GEL 400G ",
+                    "BOLSA TERMICA GEL HIDROLIGHT 200G",
+                    "BOLSA TERMICA GEL HIDROLIGHT 400G BT101"
+                ]
+    },
+    {
+        "query":  "antiacido",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "antiacido",
+        "forma_farmaceutica":  null,
+        "metodo":  "nenhum método encontrou resultados",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "remedio pra azia",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "ACICLOVIR",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ACICLOVIR 200MG 30CP(PRA)",
+                    "ACICLOVIR 50MG/G CR DERM 10G(PRA)",
+                    "ACICLOVIR 200MG 25CP(PHA)"
+                ]
+    },
+    {
+        "query":  "laxante",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "laxante",
+        "forma_farmaceutica":  null,
+        "metodo":  "nenhum método encontrou resultados",
+        "total":  0,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+
+                ]
+    },
+    {
+        "query":  "leite de magnesia",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "HIDRÓXIDO DE MAGNÉSIO",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  5,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "LEITE DE MAG ENO TRAD 120ML",
+                    "LEITE DE MAG MAGMAX HOR 100ML",
+                    "LEITE DE MAG PHILL HOR 120ML"
+                ]
+    },
+    {
+        "query":  "probiotico adulto",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "probiotico adulto",
+        "forma_farmaceutica":  null,
+        "metodo":  "descricao",
+        "total":  1,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "KIT NEBULIZACAO NS ADULTO"
+                ]
+    },
+    {
+        "query":  "remedio pra colica",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "ACICLOVIR",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ACICLOVIR 200MG 30CP(PRA)",
+                    "ACICLOVIR 50MG/G CR DERM 10G(PRA)",
+                    "ACICLOVIR 200MG 25CP(PHA)"
+                ]
+    },
+    {
+        "query":  "remedio pra alergia",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "ACICLOVIR",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ACICLOVIR 200MG 30CP(PRA)",
+                    "ACICLOVIR 50MG/G CR DERM 10G(PRA)",
+                    "ACICLOVIR 200MG 25CP(PHA)"
+                ]
+    },
+    {
+        "query":  "remedio pra enjoo",
+        "termo_corrigido":  null,
+        "principio_ativo_extraido":  "ACICLOVIR",
+        "forma_farmaceutica":  null,
+        "metodo":  "principio_ativo_sem_filtros + descricao + principio_ativo_por_ids_sem_filtros",
+        "total":  20,
+        "correcao":  false,
+        "ambigua":  false,
+        "clarificar":  false,
+        "top":  [
+                    "ACICLOVIR 200MG 30CP(PRA)",
+                    "ACICLOVIR 50MG/G CR DERM 10G(PRA)",
+                    "ACICLOVIR 200MG 25CP(PHA)"
+                ]
+    }
+]

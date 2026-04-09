@@ -6,6 +6,7 @@ const {
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+const REGEX_CATEGORIA_NAO_MEDICAMENTO = /\b(shampoo|xampu|condicionador|sabonete|hidratante|desodorante|perfume|protetor|fralda|absorvente|escova|pasta|creme dental|cosmetico|cotonete|haste flexivel|algodao|gaze|compressa|esparadrapo|micropore|curativo|mascara|lenco|repelente|termometro|alcool|agua oxigenada|fio dental|enxaguante)\b/i;
 
 function extrairObjetoJSON(texto) {
   const conteudo = String(texto || '')
@@ -41,6 +42,10 @@ function deveTentarPreBuscaIA({ termoOriginal, termoBase }) {
   }
 
   if (!base || base.length < 4) {
+    return false;
+  }
+
+  if (REGEX_CATEGORIA_NAO_MEDICAMENTO.test(texto) || REGEX_CATEGORIA_NAO_MEDICAMENTO.test(base)) {
     return false;
   }
 

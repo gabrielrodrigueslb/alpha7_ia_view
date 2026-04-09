@@ -28,7 +28,7 @@ const REGEX_TERMO_SIMILAR = /\b(similar|similares|sim)\b/gi;
 const REGEX_TERMO_GENERICO_TESTE = /\b(generico|genericos|gen)\b/i;
 const REGEX_TERMO_REFERENCIA_TESTE = /\b(referencia|referencias|ref|etico|etica|marca)\b/i;
 const REGEX_TERMO_SIMILAR_TESTE = /\b(similar|similares|sim)\b/i;
-const REGEX_TERMO_PERFUMARIA = /\b(shampoo|condicionador|sabonete|hidratante|desodorante|perfume|protetor|fralda|absorvente|escova|pasta|creme dental|cosmetico|cosmético)\b/i;
+const REGEX_TERMO_PERFUMARIA = /\b(shampoo|xampu|condicionador|sabonete|hidratante|desodorante|perfume|protetor|protetor solar|protetor labial|fralda|absorvente|escova|pasta|creme dental|creme para maos|maos|cosmetico|cotonete|haste flexivel|algodao|gaze|compressa|esparadrapo|micropore|curativo|mascara|lenco|repelente|termometro|alcool|agua oxigenada|fio dental|enxaguante)\b/i;
 const STOPWORDS_BUSCA = new Set([
   'de', 'da', 'do', 'das', 'dos', 'e', 'com', 'sem', 'para', 'por', 'na', 'no', 'nas', 'nos',
   'mg', 'ml', 'mcg', 'g', 'ui', 'cp', 'cps', 'caps', 'comp', 'comprimido', 'comprimidos'
@@ -45,7 +45,7 @@ function normalizarTextoBusca(valor) {
 }
 
 function detectarIntencaoBusca(termo) {
-  const texto = String(termo || '');
+  const texto = normalizarTextoBusca(String(termo || ''));
 
   return {
     querGenerico: REGEX_TERMO_GENERICO_TESTE.test(texto),
@@ -610,7 +610,185 @@ function obterCategoriaNaoMedicamento(query) {
     return 'absorvente';
   }
 
+   if (/\b(cotonete|cotonetes|haste flexivel|hastes flexiveis)\b/.test(texto)) {
+    return 'cotonete';
+  }
+
+  if (/\b(algodao|hidrofilo)\b/.test(texto)) {
+    return 'algodao';
+  }
+
+  if (/\b(gaze|compressa|compressas)\b/.test(texto)) {
+    return 'gaze';
+  }
+
+  if (/\b(esparadrapo|micropore|fita cirurgica)\b/.test(texto)) {
+    return 'esparadrapo';
+  }
+
+  if (/\b(curativo|curativos|bandagem|band aid)\b/.test(texto)) {
+    return 'curativo';
+  }
+
+  if (/\b(mascara|mascaras)\b/.test(texto)) {
+    return 'mascara';
+  }
+
+  if (/\b(lenco|lencos|umedecido|umedecidos)\b/.test(texto)) {
+    return 'lenco';
+  }
+
+  if (/\b(termometro|termometros)\b/.test(texto)) {
+    return 'termometro';
+  }
+
+  if (/\b(repelente|repelentes)\b/.test(texto)) {
+    return 'repelente';
+  }
+
+  if (/\b(alcool|alcool 70)\b/.test(texto)) {
+    return 'alcool';
+  }
+
+  if (/\b(agua oxigenada)\b/.test(texto)) {
+    return 'agua_oxigenada';
+  }
+
+  if (/\b(fio dental)\b/.test(texto)) {
+    return 'fio_dental';
+  }
+
+  if (/\b(enxaguante|enxaguatorio)\b/.test(texto)) {
+    return 'enxaguante';
+  }
+
+  if (/\b(maos|mao)\b/.test(texto)) {
+    return 'creme_maos';
+  }
+
   return null;
+}
+
+function textoProdutoNaoMedicamento(produto) {
+  return normalizarTextoBuscaMedicamento(
+    `${produto?.descricao || ''} ${produto?.embalagem_descricao || ''} ${produto?.classificacao_nome_origem || ''}`
+  );
+}
+
+function obterTermosAlternativosCategoria(query) {
+  const categoria = obterCategoriaNaoMedicamento(query);
+
+  switch (categoria) {
+    case 'fralda':
+      if (/\b(geriatr\w*|adult\w*)\b/.test(normalizarTextoBuscaMedicamento(query))) {
+        return ['fralda geriatrica', 'fralda adulta', 'geriatrica'];
+      }
+      return ['fralda', 'fraldas', 'frd'];
+    case 'shampoo':
+      return ['shampoo', 'xampu', 'sh'];
+    case 'absorvente':
+      return ['absorvente'];
+    case 'cotonete':
+      return ['cotonete', 'hastes flexiveis', 'haste flexivel'];
+    case 'algodao':
+      return ['algodao hidrofilo', 'algodao'];
+    case 'gaze':
+      return ['gaze esteril', 'compressa gaze', 'gaze'];
+    case 'esparadrapo':
+      return ['esparadrapo', 'micropore'];
+    case 'curativo':
+      return ['curativo', 'bandagem'];
+    case 'mascara':
+      return ['mascara descartavel', 'mascara tripla', 'mascara'];
+    case 'lenco':
+      return ['lenco umedecido', 'lenco'];
+    case 'termometro':
+      return ['termometro digital', 'termometro'];
+    case 'repelente':
+      return ['repelente spray', 'repelente'];
+    case 'alcool':
+      return ['alcool 70', 'alcool gel', 'alcool'];
+    case 'agua_oxigenada':
+      return ['agua oxigenada 10 volumes', 'agua oxigenada'];
+    case 'fio_dental':
+      return ['fio dental'];
+    case 'enxaguante':
+      return ['enxaguante bucal', 'enxaguante'];
+    case 'creme_maos':
+      return ['creme para maos', 'hidratante para maos', 'maos'];
+    default:
+      return [];
+  }
+}
+
+function produtoAtendeCategoriaNaoMedicamento(produto, categoria, query) {
+  const texto = textoProdutoNaoMedicamento(produto);
+  const queryNormalizada = normalizarTextoBuscaMedicamento(query);
+
+  switch (categoria) {
+    case 'fralda': {
+      if (!/\b(fralda|fraldas|frd)\b/.test(texto)) {
+        return false;
+      }
+
+      if (/\bfita\b/.test(texto) || /\babsorvente\b/.test(texto)) {
+        return false;
+      }
+
+      if (/\b(geriatr\w*|adult\w*)\b/.test(queryNormalizada)) {
+        return /\b(geriatr\w*|adult\w*)\b/.test(texto);
+      }
+
+      if (/\binfantil|baby|bebe|jumb|shortinho|roupinha|rn|mega|xxg|xg|g\b/.test(queryNormalizada)) {
+        return !/\b(geriatr\w*|adult\w*)\b/.test(texto);
+      }
+
+      if (/\b(geriatr\w*|adult\w*)\b/.test(texto)) {
+        return false;
+      }
+
+      return true;
+    }
+    case 'shampoo':
+      return /\bshampoo\b/.test(texto) && !/\bcondicionador\b/.test(texto);
+    case 'absorvente':
+      return /\babsorvente\b/.test(texto) && !/\b(fralda|fraldas|frd)\b/.test(texto);
+    case 'cotonete':
+      return /\b(cotonete|cotonetes|haste flexivel|hastes flexiveis)\b/.test(texto);
+    case 'algodao':
+      return /\b(algodao|hidrofilo)\b/.test(texto);
+    case 'gaze':
+      return /\b(gaze|compressa|compressas)\b/.test(texto)
+        && !/\b(contracep|anticoncepcional|comprimido|capsula)\b/.test(texto);
+    case 'esparadrapo':
+      return /\b(esparadrapo|micropore|fita cirurgica)\b/.test(texto);
+    case 'curativo':
+      return /\b(curativo|curativos|bandagem|band aid)\b/.test(texto);
+    case 'mascara':
+      return /\b(mascara|mascaras)\b/.test(texto)
+        && !/\babsorvente\b/.test(texto);
+    case 'lenco':
+      return /\b(lenco|lencos)\b/.test(texto);
+    case 'termometro':
+      return /\b(termometro|termometros)\b/.test(texto);
+    case 'repelente':
+      return /\b(repelente|repelentes)\b/.test(texto);
+    case 'alcool':
+      return /\balcool\b/.test(texto)
+        && !/\bzero alcool\b/.test(texto)
+        && !/\benxaguante\b/.test(texto);
+    case 'agua_oxigenada':
+      return /\bagua oxigenada\b/.test(texto);
+    case 'fio_dental':
+      return /\bfio dental\b/.test(texto);
+    case 'enxaguante':
+      return /\b(enxaguante|enxaguatorio)\b/.test(texto);
+    case 'creme_maos':
+      return /\b(maos|mao|hand)\b/.test(texto)
+        || (/\b(creme|hidratante)\b/.test(texto) && /\bureia\b/.test(texto));
+    default:
+      return true;
+  }
 }
 
 function pontuarProdutoCategoriaNaoMedicamento(produto, query) {
@@ -667,8 +845,94 @@ function pontuarProdutoCategoriaNaoMedicamento(produto, query) {
       score += 160;
     }
 
-    if (/\bfralda|fraldas|frd\b/.test(textoProduto)) {
+    if (/\b(fralda|fraldas|frd)\b/.test(textoProduto)) {
       score -= 180;
+    }
+  }
+
+  if (categoria === 'cotonete' && /\b(cotonete|cotonetes|haste flexivel|hastes flexiveis)\b/.test(textoProduto)) {
+    score += 220;
+  }
+
+  if (categoria === 'algodao' && /\b(algodao|hidrofilo)\b/.test(textoProduto)) {
+    score += 220;
+  }
+
+  if (categoria === 'gaze') {
+    if (/\b(gaze|compressa|compressas)\b/.test(textoProduto)) {
+      score += 220;
+    }
+
+    if (/\bcontracep|anticoncepcional\b/.test(textoProduto)) {
+      score -= 260;
+    }
+  }
+
+  if (categoria === 'esparadrapo' && /\b(esparadrapo|micropore|fita cirurgica)\b/.test(textoProduto)) {
+    score += 220;
+  }
+
+  if (categoria === 'curativo' && /\b(curativo|curativos|bandagem|band aid)\b/.test(textoProduto)) {
+    score += 220;
+  }
+
+  if (categoria === 'mascara') {
+    if (/\b(mascara|mascaras)\b/.test(textoProduto)) {
+      score += 220;
+    }
+
+    if (/\babsorvente\b/.test(textoProduto)) {
+      score -= 300;
+    }
+  }
+
+  if (categoria === 'lenco' && /\blenco|lencos\b/.test(textoProduto)) {
+    score += 200;
+  }
+
+  if (categoria === 'termometro' && /\b(termometro|termometros)\b/.test(textoProduto)) {
+    score += 220;
+  }
+
+  if (categoria === 'repelente' && /\b(repelente|repelentes)\b/.test(textoProduto)) {
+    score += 220;
+  }
+
+  if (categoria === 'alcool') {
+    if (/\balcool\b/.test(textoProduto)) {
+      score += 220;
+    }
+
+    if (/\bzero alcool\b/.test(textoProduto) || /\benxaguante\b/.test(textoProduto)) {
+      score -= 320;
+    }
+  }
+
+  if (categoria === 'agua_oxigenada' && /\bagua oxigenada\b/.test(textoProduto)) {
+    score += 220;
+  }
+
+  if (categoria === 'fio_dental') {
+    if (/\bfio dental\b/.test(textoProduto)) {
+      score += 220;
+    }
+
+    if (/\b(amoxicilina|hidro|clorid)/i.test(textoProduto)) {
+      score -= 260;
+    }
+  }
+
+  if (categoria === 'enxaguante' && /\b(enxaguante|enxaguatorio)\b/.test(textoProduto)) {
+    score += 220;
+  }
+
+  if (categoria === 'creme_maos') {
+    if (/\b(maos|mao|hand)\b/.test(textoProduto)) {
+      score += 240;
+    }
+
+    if (/\bcorporal\b/.test(textoProduto)) {
+      score -= 160;
     }
   }
 
@@ -686,37 +950,13 @@ function aplicarFiltroCategoriaNaoMedicamento(produtos, query) {
     };
   }
 
-  if (categoria === 'fralda') {
-    const candidatosDiretos = lista.filter(produto => {
-      const texto = normalizarTextoBuscaMedicamento(
-        `${produto?.descricao || ''} ${produto?.embalagem_descricao || ''} ${produto?.classificacao_nome_origem || ''}`
-      );
+  const candidatosDiretos = lista.filter(produto => produtoAtendeCategoriaNaoMedicamento(produto, categoria, query));
 
-      if (!/\b(fralda|fraldas|frd)\b/.test(texto)) {
-        return false;
-      }
-
-      if (/\bfita\b/.test(texto)) {
-        return false;
-      }
-
-      if (/\babsorvente\b/.test(texto)) {
-        return false;
-      }
-
-      if (/\bgeriatr/i.test(texto) && !/\bgeriatr/i.test(normalizarTextoBuscaMedicamento(query))) {
-        return false;
-      }
-
-      return true;
-    });
-
-    if (candidatosDiretos.length > 0) {
-      return {
-        produtos: candidatosDiretos,
-        aplicado: true
-      };
-    }
+  if (candidatosDiretos.length > 0) {
+    return {
+      produtos: candidatosDiretos,
+      aplicado: true
+    };
   }
 
   return {
@@ -751,6 +991,17 @@ function reconstruirTermoComAtributos(termoBase, { formaFarmaceutica, concentrac
   return partes.filter(Boolean).join(' ').trim();
 }
 
+function extrairMedidasLivres(texto) {
+  const normalizado = normalizarTextoBuscaMedicamento(texto);
+  const matches = normalizado.match(/\b\d+(?:[.,]\d+)?\s?(?:ml|l|g|kg|m|cm|mm|un|und|unid|litros?)\b/gi) || [];
+  return [...new Set(matches.map(item => normalizarTextoBuscaMedicamento(item).replace(/\s+/g, '')))];
+}
+
+function deveAplicarFiltroMedidaLivre(query) {
+  const categoria = obterCategoriaNaoMedicamento(query);
+  return new Set(['algodao', 'esparadrapo', 'alcool', 'fio_dental', 'repelente', 'shampoo', 'condicionador', 'hidratante']).has(categoria);
+}
+
 function deveExecutarFallbackDescricaoOriginal({ termoBusca, termoBuscaPrincipal, concentracoesBusca, correcaoAplicada }) {
   if (correcaoAplicada) {
     return false;
@@ -772,7 +1023,8 @@ function extrairAtributosProdutoBusca(produto) {
 
   return {
     concentracoes: extrairConcentracoes(texto),
-    formas: extrairFormasDeTexto(texto)
+    formas: extrairFormasDeTexto(texto),
+    medidasLivres: extrairMedidasLivres(texto)
   };
 }
 
@@ -780,6 +1032,7 @@ function aplicarFiltroEstritoPorAtributos(produtos, contextoBusca) {
   let lista = Array.isArray(produtos) ? [...produtos] : [];
   const regrasAplicadas = [];
   const concentracoesSolicitadas = [...new Set(contextoBusca?.concentracoesBusca || [])];
+  const medidasLivresSolicitadas = [...new Set(contextoBusca?.medidasLivresBusca || [])];
   const formasSolicitadas = [...new Set(contextoBusca?.variacoesForma || [])];
   const formaCanonicaSolicitada = contextoBusca?.formaFarmaceutica
     ? normalizarTextoBuscaMedicamento(contextoBusca.formaFarmaceutica)
@@ -811,6 +1064,22 @@ function aplicarFiltroEstritoPorAtributos(produtos, contextoBusca) {
     if (comMatchForma.length > 0 && comMatchForma.length < lista.length) {
       lista = comMatchForma;
       regrasAplicadas.push(`forma:${[...formasSolicitadasNormalizadas].join('|')}`);
+    }
+  }
+
+  if (
+    medidasLivresSolicitadas.length > 0 &&
+    lista.length > 0 &&
+    deveAplicarFiltroMedidaLivre(contextoBusca?.termoOriginal || contextoBusca?.termoBusca || '')
+  ) {
+    const comMatchMedidaLivre = lista.filter(produto => {
+      const atributos = extrairAtributosProdutoBusca(produto);
+      return atributos.medidasLivres.some(medida => medidasLivresSolicitadas.includes(medida));
+    });
+
+    if (comMatchMedidaLivre.length > 0 && comMatchMedidaLivre.length < lista.length) {
+      lista = comMatchMedidaLivre;
+      regrasAplicadas.push(`medida:${medidasLivresSolicitadas.join('|')}`);
     }
   }
 
@@ -846,6 +1115,7 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
       concentracoesBusca,
       variacoesConcentracao
     } = extrairContextoBuscaMedicamento(termoBusca);
+    const medidasLivresBusca = extrairMedidasLivres(termoBusca);
     let termoBuscaPrincipal = limparTermoBuscaPrincipal(termoBuscaLimpo)
       || limparTermoBuscaPrincipal(principioAtivoExtraido)
       || limparTermoBuscaPrincipal(termoBusca)
@@ -855,38 +1125,25 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
     let principioAtivoBusca = termoBuscaPrincipal;
     let principioAtivoResolvido = null;
     const buscaPerfumaria = intencaoBusca.querPerfumaria === true;
+    let formaFarmaceuticaEfetiva = formaFarmaceutica;
+    let variacoesFormaEfetivas = variacoesForma;
 
     if (buscaPerfumaria) {
       termoBuscaPrincipal = termoBusca;
       principioAtivoBusca = termoBusca;
+      if (formaFarmaceuticaEfetiva === 'spray_nasal') {
+        formaFarmaceuticaEfetiva = null;
+        variacoesFormaEfetivas = [];
+      }
     }
     let correcaoTermo = null;
 
-    const normalizacaoIA = await normalizarBuscaComIA({
+    const normalizacaoIACandidata = await normalizarBuscaComIA({
       termoOriginal: termoBusca,
       termoBase: termoBuscaPrincipal,
-      formaFarmaceutica,
+      formaFarmaceutica: formaFarmaceuticaEfetiva,
       concentracoesBusca
     });
-
-    if (
-      normalizacaoIA?.termo_corrigido &&
-      normalizacaoIA.manter_original !== true &&
-      normalizacaoIA.confianca >= 0.9 &&
-      normalizarTextoBusca(normalizacaoIA.termo_corrigido) !== normalizarTextoBusca(termoBuscaPrincipal)
-    ) {
-      console.log(
-        `[TRACE] IA pre-busca normalizou termo: "${termoBuscaPrincipal}" -> "${normalizacaoIA.termo_corrigido}" ` +
-        `| confianca=${normalizacaoIA.confianca.toFixed(3)} | motivo=${normalizacaoIA.justificativa_curta || 'n/a'}`
-      );
-      principioAtivoBusca = normalizacaoIA.termo_corrigido;
-      correcaoTermo = {
-        termo_original: termoBuscaPrincipal,
-        termo_corrigido: normalizacaoIA.termo_corrigido,
-        origem: 'ia_pre_busca',
-        score: normalizacaoIA.confianca
-      };
-    }
 
     console.log(`[INFO] Termo principal de busca: "${termoBuscaPrincipal}"`);
     console.log(
@@ -895,7 +1152,7 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
     );
 
     console.log(`[INFO] Princípio ativo extraído: "${principioAtivoBusca}"`);
-    console.log(`[INFO] Forma farmacêutica: "${formaFarmaceutica || 'nenhuma'}"`);
+    console.log(`[INFO] Forma farmacêutica: "${formaFarmaceuticaEfetiva || 'nenhuma'}"`);
 
     if (concentracoesBusca.length > 0) {
       console.log(`[INFO] Concentracoes: ${concentracoesBusca.join(' | ')}`);
@@ -907,18 +1164,14 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
     let metodosUtilizados = [];
     let termoBuscaDescricao = principioAtivoBusca;
     let termoBuscaDescricaoExpandido = reconstruirTermoComAtributos(principioAtivoBusca, {
-      formaFarmaceutica,
+      formaFarmaceutica: formaFarmaceuticaEfetiva,
       concentracoesBusca
     });
-
-    if (correcaoTermo?.origem === 'ia_pre_busca') {
-      metodosUtilizados.push('ia_pre_busca');
-    }
 
     let [resultadoPrincipioAtivo, resultadoDescricao] = await Promise.all([
       buscaPerfumaria
         ? Promise.resolve({ encontrado: false, produtos: [], principiosEncontrados: [], metodo: 'principio_ativo_ignorado_perfumaria' })
-        : buscarPorPrincipioAtivo(principioAtivoBusca, formaFarmaceutica, variacoesForma, variacoesConcentracao),
+        : buscarPorPrincipioAtivo(principioAtivoBusca, formaFarmaceuticaEfetiva, variacoesFormaEfetivas, variacoesConcentracao),
       buscarPorDescricao(termoBuscaDescricao)
     ]);
 
@@ -945,7 +1198,105 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
       }
     }
 
+    if (buscaPerfumaria) {
+      const termosAlternativosCategoria = obterTermosAlternativosCategoria(termoBusca);
+      const jaTemCategoriaCoerente = produtosDescricao.some(produto => (
+        produtoAtendeCategoriaNaoMedicamento(produto, obterCategoriaNaoMedicamento(termoBusca), termoBusca)
+      ));
+
+      if (!jaTemCategoriaCoerente && termosAlternativosCategoria.length > 0) {
+        for (const termoAlternativo of termosAlternativosCategoria) {
+          if (!termoAlternativo || normalizarTextoBusca(termoAlternativo) === normalizarTextoBusca(termoBuscaDescricao)) {
+            continue;
+          }
+
+          const resultadoDescricaoAlternativa = await buscarPorDescricao(termoAlternativo);
+          const filtradoAlternativo = aplicarFiltroCategoriaNaoMedicamento(
+            resultadoDescricaoAlternativa.produtos || [],
+            termoBusca
+          );
+
+          if (filtradoAlternativo.aplicado && filtradoAlternativo.produtos.length > 0) {
+            produtosDescricao = filtradoAlternativo.produtos;
+            termoBuscaDescricao = termoAlternativo;
+            termoBuscaDescricaoExpandido = termoAlternativo;
+            metodosUtilizados.push(`descricao_categoria:${termoAlternativo}`);
+            metodosUtilizados.push('filtro_categoria_nao_medicamento_descricao');
+            logResumoProdutos('Resultado por descricao alternativa de categoria', produtosDescricao);
+            break;
+          }
+        }
+      }
+    }
+
     if (!resultadoPrincipioAtivo.encontrado && produtosDescricao.length === 0) {
+      if (
+        normalizacaoIACandidata?.termo_corrigido &&
+        normalizacaoIACandidata.manter_original !== true &&
+        normalizacaoIACandidata.confianca >= 0.9 &&
+        normalizarTextoBusca(normalizacaoIACandidata.termo_corrigido) !== normalizarTextoBusca(termoBuscaPrincipal)
+      ) {
+        console.log(
+          `[TRACE] IA pre-busca candidata: "${termoBuscaPrincipal}" -> "${normalizacaoIACandidata.termo_corrigido}" ` +
+          `| confianca=${normalizacaoIACandidata.confianca.toFixed(3)} | motivo=${normalizacaoIACandidata.justificativa_curta || 'n/a'}`
+        );
+
+        const contextoIaCorrigido = extrairContextoBuscaMedicamento(normalizacaoIACandidata.termo_corrigido);
+        const termoIaCorrigidoPrincipal = limparTermoBuscaPrincipal(contextoIaCorrigido.termoBuscaLimpo)
+          || limparTermoBuscaPrincipal(contextoIaCorrigido.principioAtivoBusca)
+          || normalizacaoIACandidata.termo_corrigido;
+        const termoIaCorrigidoExpandido = reconstruirTermoComAtributos(termoIaCorrigidoPrincipal, {
+          formaFarmaceutica: contextoIaCorrigido.formaFarmaceutica || formaFarmaceuticaEfetiva,
+          concentracoesBusca
+        });
+
+        const [resultadoPrincipioIaCorrigido, resultadoDescricaoIaCorrigida] = await Promise.all([
+          buscaPerfumaria
+            ? Promise.resolve({ encontrado: false, produtos: [], principiosEncontrados: [], metodo: 'principio_ativo_ignorado_perfumaria' })
+            : buscarPorPrincipioAtivo(
+              termoIaCorrigidoPrincipal,
+              contextoIaCorrigido.formaFarmaceutica || formaFarmaceuticaEfetiva,
+              contextoIaCorrigido.variacoesForma.length > 0 ? contextoIaCorrigido.variacoesForma : variacoesFormaEfetivas,
+              contextoIaCorrigido.variacoesConcentracao.length > 0
+                ? contextoIaCorrigido.variacoesConcentracao
+                : variacoesConcentracao
+            ),
+          buscarPorDescricao(termoIaCorrigidoExpandido)
+        ]);
+
+        if (resultadoPrincipioIaCorrigido.encontrado || resultadoDescricaoIaCorrigida.encontrado) {
+          correcaoTermo = {
+            termo_original: termoBuscaPrincipal,
+            termo_corrigido: normalizacaoIACandidata.termo_corrigido,
+            origem: 'ia_pre_busca',
+            score: normalizacaoIACandidata.confianca
+          };
+          metodosUtilizados.push('ia_pre_busca');
+
+          if (resultadoPrincipioIaCorrigido.encontrado) {
+            resultadoPrincipioAtivo = resultadoPrincipioIaCorrigido;
+            produtosPrincipioAtivo = resultadoPrincipioIaCorrigido.produtos;
+            principiosEncontrados = resultadoPrincipioIaCorrigido.principiosEncontrados || [];
+            metodosUtilizados.push(resultadoPrincipioIaCorrigido.metodo);
+            principioAtivoBusca = termoIaCorrigidoPrincipal;
+            termoBuscaDescricao = termoIaCorrigidoPrincipal;
+            termoBuscaDescricaoExpandido = termoIaCorrigidoExpandido;
+          }
+
+          if (resultadoDescricaoIaCorrigida.encontrado) {
+            resultadoDescricao = resultadoDescricaoIaCorrigida;
+            produtosDescricao = resultadoDescricaoIaCorrigida.produtos;
+            metodosUtilizados.push(resultadoDescricaoIaCorrigida.metodo);
+            principioAtivoBusca = termoIaCorrigidoPrincipal;
+            termoBuscaDescricao = termoIaCorrigidoPrincipal;
+            termoBuscaDescricaoExpandido = termoIaCorrigidoExpandido;
+          }
+        }
+      }
+
+      if (resultadoPrincipioAtivo.encontrado || produtosDescricao.length > 0) {
+        // A correção por IA já resolveu a busca; não precisa seguir para correção local.
+      } else {
       const sugestaoCorrecao = await sugerirCorrecaoTermo(termoBuscaPrincipal);
 
       if (sugestaoCorrecao?.termo_corrigido) {
@@ -959,7 +1310,7 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
           || limparTermoBuscaPrincipal(contextoCorrigido.principioAtivoBusca)
           || sugestaoCorrecao.termo_corrigido;
         const termoCorrigidoExpandido = reconstruirTermoComAtributos(termoCorrigidoPrincipal, {
-          formaFarmaceutica: contextoCorrigido.formaFarmaceutica || formaFarmaceutica,
+          formaFarmaceutica: contextoCorrigido.formaFarmaceutica || formaFarmaceuticaEfetiva,
           concentracoesBusca
         });
 
@@ -968,8 +1319,8 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
             ? Promise.resolve({ encontrado: false, produtos: [], principiosEncontrados: [], metodo: 'principio_ativo_ignorado_perfumaria' })
             : buscarPorPrincipioAtivo(
               termoCorrigidoPrincipal,
-              contextoCorrigido.formaFarmaceutica || formaFarmaceutica,
-              contextoCorrigido.variacoesForma.length > 0 ? contextoCorrigido.variacoesForma : variacoesForma,
+              contextoCorrigido.formaFarmaceutica || formaFarmaceuticaEfetiva,
+              contextoCorrigido.variacoesForma.length > 0 ? contextoCorrigido.variacoesForma : variacoesFormaEfetivas,
               contextoCorrigido.variacoesConcentracao.length > 0
                 ? contextoCorrigido.variacoesConcentracao
                 : variacoesConcentracao
@@ -996,6 +1347,7 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
           termoBuscaDescricao = termoCorrigidoPrincipal;
           termoBuscaDescricaoExpandido = termoCorrigidoExpandido;
         }
+      }
       }
     }
 
@@ -1052,8 +1404,8 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
     ) {
       const resultadoPrincipioAtivoResolvido = await buscarPorPrincipioAtivo(
         principioAtivoResolvido,
-        formaFarmaceutica,
-        variacoesForma,
+        formaFarmaceuticaEfetiva,
+        variacoesFormaEfetivas,
         variacoesConcentracao
       );
 
@@ -1092,8 +1444,8 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
       console.log(`[TRACE] IDs de principio ativo herdados da descricao: ${principioAtivoIdsDaDescricao.slice(0, 10).join(', ')}`);
       const resultadoExpandidoPorPrincipio = await buscarPorPrincipioAtivoIds(
         principioAtivoIdsDaDescricao.slice(0, 10),
-        formaFarmaceutica,
-        variacoesForma,
+        formaFarmaceuticaEfetiva,
+        variacoesFormaEfetivas,
         variacoesConcentracao
       );
 
@@ -1161,10 +1513,12 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
 
     if (produtos.length > 0) {
       const resultadoFiltroAtributos = aplicarFiltroEstritoPorAtributos(produtos, {
-        formaFarmaceutica,
-        variacoesForma,
+        formaFarmaceutica: formaFarmaceuticaEfetiva,
+        variacoesForma: variacoesFormaEfetivas,
         concentracoesBusca,
-        variacoesConcentracao
+        variacoesConcentracao,
+        medidasLivresBusca,
+        termoOriginal: termoBusca
       });
 
       if (resultadoFiltroAtributos.aplicado) {
@@ -1206,7 +1560,7 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
         termoBusca,
         termoBuscaPrincipal,
         principioAtivoBusca,
-        formaFarmaceutica,
+        formaFarmaceutica: formaFarmaceuticaEfetiva,
         intencaoClassificacao: intencaoBusca,
         buscaPerfumaria
       });
@@ -1226,8 +1580,8 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
         principioAtivoBusca,
         principioAtivoResolvido,
         produtosAtuais: produtos,
-        formaFarmaceutica,
-        variacoesForma,
+        formaFarmaceutica: formaFarmaceuticaEfetiva,
+        variacoesForma: variacoesFormaEfetivas,
         concentracoesBusca,
         variacoesConcentracao,
         unidadeNegocioId,
@@ -1305,7 +1659,7 @@ router.post('/api/buscar-medicamentos', async (req, res) => {
         termo_original: termoBusca,
         termo_corrigido: correcaoTermo?.termo_corrigido || null,
         principio_ativo_extraido: principioAtivoResolvido || principioAtivoBusca || principioAtivoExtraido || null,
-        forma_farmaceutica: formaFarmaceutica
+        forma_farmaceutica: formaFarmaceuticaEfetiva
       },
       metadados: {
         metodo_busca: metodoBusca,

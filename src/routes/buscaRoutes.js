@@ -606,6 +606,22 @@ function obterCategoriaNaoMedicamento(query) {
     return 'shampoo';
   }
 
+  if (/\b(condicionador|cond)\b/.test(texto)) {
+    return 'condicionador';
+  }
+
+  if (/\b(sabonete|sab)\b/.test(texto)) {
+    return 'sabonete';
+  }
+
+  if (/\b(desodorante|desod|antitranspirante)\b/.test(texto)) {
+    return 'desodorante';
+  }
+
+  if (/\b(creme dental|pasta de dente|pastadente|pasta dental)\b/.test(texto)) {
+    return 'creme_dental';
+  }
+
   if (/\b(absorvente|absorventes)\b/.test(texto)) {
     return 'absorvente';
   }
@@ -686,6 +702,14 @@ function obterTermosAlternativosCategoria(query) {
       return ['fralda', 'fraldas', 'frd'];
     case 'shampoo':
       return ['shampoo', 'xampu', 'sh'];
+    case 'condicionador':
+      return ['condicionador', 'cond'];
+    case 'sabonete':
+      return ['sabonete', 'sab'];
+    case 'desodorante':
+      return ['desodorante', 'antitranspirante'];
+    case 'creme_dental':
+      return ['creme dental', 'pasta de dente', 'pasta dental'];
     case 'absorvente':
       return ['absorvente'];
     case 'cotonete':
@@ -751,6 +775,23 @@ function produtoAtendeCategoriaNaoMedicamento(produto, categoria, query) {
     }
     case 'shampoo':
       return /\bshampoo\b/.test(texto) && !/\bcondicionador\b/.test(texto);
+    case 'condicionador':
+      return /\bcondicionador\b/.test(texto)
+        && !/\bshampoo\b/.test(texto)
+        && !/\bsabonete\b/.test(texto);
+    case 'sabonete':
+      return /\bsabonete\b/.test(texto)
+        && !/\bcondicionador\b/.test(texto)
+        && !/\bshampoo\b/.test(texto)
+        && !/\bdesodorante\b/.test(texto);
+    case 'desodorante':
+      return /\b(desodorante|antitranspirante)\b/.test(texto)
+        && !/\brepelente\b/.test(texto)
+        && !/\bcondicionador\b/.test(texto);
+    case 'creme_dental':
+      return /\b(creme dental|pasta de dente|pasta dental|dental)\b/.test(texto)
+        && !/\bcondicionador\b/.test(texto)
+        && !/\bshampoo\b/.test(texto);
     case 'absorvente':
       return /\babsorvente\b/.test(texto) && !/\b(fralda|fraldas|frd)\b/.test(texto);
     case 'cotonete':
@@ -837,6 +878,54 @@ function pontuarProdutoCategoriaNaoMedicamento(produto, query) {
 
     if (/\bkit\b/.test(textoProduto)) {
       score -= 120;
+    }
+  }
+
+  if (categoria === 'condicionador') {
+    if (/\bcondicionador\b/.test(textoProduto)) {
+      score += 180;
+    }
+
+    if (/\bshampoo\b/.test(textoProduto) || /\bsabonete\b/.test(textoProduto)) {
+      score -= 260;
+    }
+  }
+
+  if (categoria === 'sabonete') {
+    if (/\bsabonete\b/.test(textoProduto)) {
+      score += 220;
+    }
+
+    if (/\bbarra\b/.test(queryNormalizada) && /\bbarra\b/.test(textoProduto)) {
+      score += 80;
+    }
+
+    if (/\bliquido\b/.test(queryNormalizada) && /\bliquido\b/.test(textoProduto)) {
+      score += 80;
+    }
+
+    if (/\bcondicionador\b/.test(textoProduto) || /\bshampoo\b/.test(textoProduto) || /\bdesodorante\b/.test(textoProduto)) {
+      score -= 320;
+    }
+  }
+
+  if (categoria === 'desodorante') {
+    if (/\b(desodorante|antitranspirante)\b/.test(textoProduto)) {
+      score += 220;
+    }
+
+    if (/\brepelente\b/.test(textoProduto) || /\bcondicionador\b/.test(textoProduto)) {
+      score -= 320;
+    }
+  }
+
+  if (categoria === 'creme_dental') {
+    if (/\b(creme dental|pasta de dente|pasta dental|dental)\b/.test(textoProduto)) {
+      score += 220;
+    }
+
+    if (/\bshampoo\b/.test(textoProduto) || /\bcondicionador\b/.test(textoProduto)) {
+      score -= 280;
     }
   }
 
